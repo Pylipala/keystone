@@ -1,0 +1,76 @@
+//
+// List Controls
+// ==============================
+
+
+
+
+// base
+
+/*button*/.ItemList__control {
+	.align-items(center);
+	.display-flex();
+	.justify-content(center);
+	.transition( color 140ms );
+	background: none;
+	border: none;
+	color: #ccc;
+	display: block;
+	height: 20px;
+	line-height: 0; // collapse buttons
+	padding: 0;
+	position: relative;
+	text-align: center;
+	width: 20px;
+
+	&:hover,
+	&:focus,
+	&:active {
+		outline: none;
+	}
+
+	// expand hit area
+	&::before {
+		bottom: -@table-padding;
+		content: " ";
+		left: -@table-padding;
+		position: absolute;
+		right: -@table-padding;
+		top: -@table-padding;
+	}
+
+	// explicit font-size (multiple of 16) + disable antialiasing stops blurring
+	// when viewport width is uneven e.g. "1283px"
+	> .octicon {
+		font-size: 16px;
+		-moz-osx-font-smoothing: none;
+		-webkit-font-smoothing: none;
+	}
+}
+
+
+// delete control
+
+.ItemList__control--delete {
+	&:hover,
+	&:focus {
+		color: @app-danger;
+	}
+}
+
+
+// sortable control
+
+.ItemList__control--sortable {
+	cursor: hand;
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
+
+	&:hover {
+		color: @text-color;
+	}
+	&:active {
+		cursor: -webkit-grabbing;
+		cursor: -moz-grabbing;
+	}
+}

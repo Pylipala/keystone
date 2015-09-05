@@ -12,7 +12,7 @@ var utils = require('keystone-utils');
 function relationship(list, path, options) {
 	this.many = (options.many) ? true : false;
 	this.filters = options.filters;
-	this._defaultSize = this.many ? 'full' : 'large';
+	this._defaultSize = 'full';
 	this._nativeType = keystone.mongoose.Schema.Types.ObjectId;
 	this._underscoreMethods = ['format'];
 	this._properties = ['isValid', 'many', 'filters'];
@@ -32,6 +32,32 @@ relationship.prototype.getProperties = function () {
 			path:     refList.path
 		}
 	};
+};
+
+/**
+ * Gets id and name for the related item(s) from populated values
+ */
+
+function expandRelatedItemData(item) {
+	if (!item || !item.id) return undefined;
+	return {
+		id: item.id,
+		name: this.refList.getDocumentName(item)
+	};
+}
+
+function truthy (value) {
+	return value;
+}
+
+relationship.prototype.getExpandedData = function(item) {
+	var value = item.get(this.path);
+	if (this.many) {
+		if (!value || !Array.isArray(value)) return [];
+		return value.map(expandRelatedItemData.bind(this)).filter(truthy);
+	} else {
+		return expandRelatedItemData.call(this, value);
+	}
 };
 
 /**
