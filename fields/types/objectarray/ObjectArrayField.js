@@ -72,7 +72,7 @@ module.exports = Field.create({
 		var updatedValues = this.state.values;
 
 		// if we define cleanInput method then clean it first
-		updatedValues[parentIndex].obj[objIndex].value = this.cleanInput ? this.cleanInput(event.target.value) : event.target.value;
+		updatedValues[parentIndex].obj[objIndex].value = this.cleanInput ? this.cleanInput(event.value) : event.value;
 
 		this.setState({
 			values: updatedValues
@@ -102,11 +102,29 @@ module.exports = Field.create({
 		});
 	},
 
-	renderPart: function(obj, objIndex, parentIndex) {
+	renderPart: function(obj/*value*/, objIndex/*propertyIndex*/, parentIndex/*arrayIndex*/) {
 		var fieldName = this.props.path + '[' + parentIndex + ']' +'[' + obj.fieldName + ']';
 		var input = <input ref={obj.key} className='form-control multi' type={obj.type} name={fieldName} value={obj.value} autoComplete='off' onChange={this.updateItem.bind(this, obj, objIndex, parentIndex)} />;
 
-		switch (obj.type) {
+		var self = this;
+
+		var getFieldProps = function(field) {
+			var props = Object.assign({}, field);
+			props.value = obj.value;
+			props.onChange = self.updateItem.bind(self, obj, objIndex, parentIndex);
+			props.mode = 'edit';
+			props.path = fieldName;
+			return props;
+		};
+
+		var part = this.props.partsOptions[objIndex];
+		var props = getFieldProps(part);
+		var Fields = require('../../../admin/src/fields');
+
+		switch (part.type) {
+			case 'select':
+			case 'relationship':
+				input = React.createElement(Fields[part.type], props);
 			case 'number':
 			case 'text':
 			case 'email':

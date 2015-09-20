@@ -5,7 +5,8 @@
 var util = require('util'),
 	utils = require('keystone-utils'),
 	Schema = require('mongoose').Schema,
-	super_ = require('../Type');
+	super_ = require('../Type'),
+	_ = require('underscore');
 
 /**
  * ObjectArray FieldType Constructor
@@ -20,6 +21,7 @@ function objectarray(list, path, options) {
 	this.itemLabel = options.itemLabel || 'Item';
 	this.parts = options.parts;
 
+
 	objectarray.super_.call(this, list, path, options);
 }
 
@@ -28,6 +30,19 @@ function objectarray(list, path, options) {
  */
 
 util.inherits(objectarray, super_);
+
+/**
+ * Get client-side properties to pass to react field.
+ */
+objectarray.prototype.getProperties = function () {
+	this.partsOptions = this.partsOptions || _.mapObject(this.parts, function(fieldOption, fieldName){
+		return new fieldOption.type(this.list, fieldName, fieldOption).getOptions();
+	}, this);
+
+	return {
+		partsOptions: this.partsOptions
+	};
+};
 
 /**
  * Validates that a value for this field has been provided in a data object
