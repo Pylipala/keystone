@@ -1,54 +1,48 @@
-import React from 'react';
-import Field from '../Field';
-import { Checkbox, FormField, FormNote } from 'elemental';
+var React = require('react'),
+	Field = require('../Field');
 
 module.exports = Field.create({
-
+	
 	displayName: 'BooleanField',
-
-	propTypes: {
-		indent: React.PropTypes.bool,
-		label: React.PropTypes.string,
-		note: React.PropTypes.string,
-		onChange: React.PropTypes.func,
-		path: React.PropTypes.string,
-		value: React.PropTypes.bool,
-	},
-
-	valueChanged (event) {
+	
+	valueChanged: function(event) {
 		this.props.onChange({
 			path: this.props.path,
 			value: event.target.checked
 		});
 	},
-
-	renderNote () {
-		if (!this.props.note) return null;
-		return <FormNote note={this.props.note} />;
-	},
-
-	renderUI () {
-		var input;
+	
+	renderUI: function() {
+		
+		var input, fieldClassName = 'field-ui';
+		
+		if (this.props.indent) {
+			fieldClassName += ' field-indented';
+		}
+		
 		if (this.shouldRenderField()) {
 			input = (
-				<Checkbox label={this.props.label} name={this.props.path} checked={this.props.value} onChange={this.valueChanged} />
+				<div className={fieldClassName}>
+					<label htmlFor={this.props.path} className="checkbox">
+						<input type='checkbox' name={this.props.path} id={this.props.path} value='true' checked={this.props.value} onChange={this.valueChanged} />
+						{this.props.label}
+					</label>
+					{this.renderNote()}
+				</div>
 			);
 		} else {
 			var state = this.props.value ? 'checked' : 'unchecked';
 			var imgSrc = '/keystone/images/icons/16/checkbox-' + state + '.png';
 			input = (
-				<div>
+				<div className={fieldClassName}>
 					<img src={imgSrc} width='16' height='16' className={state} style={{ marginRight: 5 }} />
 					<span>{this.props.label}</span>
+					<div>{this.renderNote()}</div>
 				</div>
 			);
 		}
-		return (
-			<FormField offsetAbsentLabel={this.props.indent} className="field-type-boolean">
-				{input}
-				{this.renderNote()}
-			</FormField>
-		);
+		
+		return <div className="field field-type-boolean">{input}</div>;
 	}
-
+	
 });
