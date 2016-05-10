@@ -1,36 +1,31 @@
-var React = require('react');
+import React from 'react';
+import ItemsTableCell from '../../../admin/client/components/ItemsTable/ItemsTableCell';
+import ItemsTableValue from '../../../admin/client/components/ItemsTable/ItemsTableValue';
 
 var TextColumn = React.createClass({
+	displayName: 'TextColumn',
 	propTypes: {
 		col: React.PropTypes.object,
-		list: React.PropTypes.object,
 		data: React.PropTypes.object,
-		href: React.PropTypes.string
+		linkTo: React.PropTypes.string,
 	},
-	renderValue: function() {
-		return this.props.data.fields[this.props.col.path];
+	getValue () {
+		// cropping text is important for textarea, which uses this column
+		const value = this.props.data.fields[this.props.col.path];
+		return value ? value.substr(0, 100) : null;
 	},
-	renderText () {
+	render () {
+		const value = this.getValue();
+		const empty = !value && this.props.linkTo ? true : false;
+		const className = this.props.col.field.monospace ? 'ItemList__value--monospace' : undefined;
 		return (
-			<div className="ItemList__value ItemList__value--text">
-				{this.renderValue()}
-			</div>
+			<ItemsTableCell>
+				<ItemsTableValue className={className} href={this.props.linkTo} empty={empty} padded interior field={this.props.col.type}>
+					{value}
+				</ItemsTableValue>
+			</ItemsTableCell>
 		);
 	},
-	renderLink () {
-		return (
-			<a href={this.props.linkTo} className="ItemList__value ItemList__value--text ItemList__link--padded ItemList__link--interior">
-				{this.renderValue()}
-			</a>
-		);
-	},
-	render: function() {
-		return (
-			<td className="ItemList__col">
-				{this.props.linkTo ? this.renderLink() : this.renderText()}
-			</td>
-		);
-	}
 });
 
 module.exports = TextColumn;

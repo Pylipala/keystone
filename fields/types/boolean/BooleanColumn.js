@@ -1,19 +1,29 @@
-var React = require('react');
-var classnames = require('classnames');
+import React from 'react';
+import classnames from 'classnames';
+import Checkbox from '../../components/Checkbox';
+import ItemsTableCell from '../../../admin/client/components/ItemsTable/ItemsTableCell';
+import ItemsTableValue from '../../../admin/client/components/ItemsTable/ItemsTableValue';
 
 var BooleanColumn = React.createClass({
-	render: function() {
-		var value = this.props.data.fields[this.props.col.path];
-		var iconClassName = classnames('ItemList__boolean-check octicon', {
-			'is-checked octicon-check': value,
-			'octicon-x': !value
-		});
+	displayName: 'BooleanColumn',
+	propTypes: {
+		col: React.PropTypes.object,
+		data: React.PropTypes.object,
+	},
+	renderValue () {
 		return (
-			<td>
-				<span className={iconClassName} />
-			</td>
+			<ItemsTableValue truncate={false} field={this.props.col.type}>
+				<Checkbox readonly checked={this.props.data.fields[this.props.col.path]} />
+			</ItemsTableValue>
 		);
-	}
+	},
+	render () {
+		return (
+			<ItemsTableCell>
+				{this.renderValue()}
+			</ItemsTableCell>
+		);
+	},
 });
 
 module.exports = BooleanColumn;

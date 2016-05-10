@@ -119,7 +119,7 @@ module.exports = Field.create({
 
 		var part = this.props.partsOptions[objIndex];
 		var props = getFieldProps(part);
-		var Fields = require('../../../admin/src/fields');
+		var Fields = require('../../../admin/client/fields');
 
 		switch (part.type) {
 			case 'select':

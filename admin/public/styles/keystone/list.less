@@ -15,24 +15,24 @@
 	display: inline-block;
 	vertical-align: middle;
 
-	&.fieldicon-text            { background-image: url( "/keystone/images/icons/16/field-text.png" ); }
-	&.fieldicon-textarea        { background-image: url( "/keystone/images/icons/16/field-textarea.png" ); }
-	&.fieldicon-name            { background-image: url( "/keystone/images/icons/16/field-name.png" ); }
-	&.fieldicon-html            { background-image: url( "/keystone/images/icons/16/field-html.png" ); }
-	&.fieldicon-url             { background-image: url( "/keystone/images/icons/16/field-url.png" ); }
-	&.fieldicon-key             { background-image: url( "/keystone/images/icons/16/field-key.png" ); }
-	&.fieldicon-email           { background-image: url( "/keystone/images/icons/16/field-email.png" ); }
-	&.fieldicon-select          { background-image: url( "/keystone/images/icons/16/field-select.png" ); }
-	&.fieldicon-location        { background-image: url( "/keystone/images/icons/16/field-location.png" ); }
-	&.fieldicon-boolean         { background-image: url( "/keystone/images/icons/16/field-boolean.png" ); }
-	&.fieldicon-cloudinaryimage { background-image: url( "/keystone/images/icons/16/field-image.png" ); }
-	&.fieldicon-s3file          { background-image: url( "/keystone/images/icons/16/field-file.png" ); }
-	&.fieldicon-relationship    { background-image: url( "/keystone/images/icons/16/field-numericSelect.png" ); }
-	&.fieldicon-date            { background-image: url( "/keystone/images/icons/16/field-date.png" ); }
-	&.fieldicon-datetime        { background-image: url( "/keystone/images/icons/16/field-dateTime.png" ); }
-	&.fieldicon-money           { background-image: url( "/keystone/images/icons/16/field-money.png" ); }
-	&.fieldicon-number          { background-image: url( "/keystone/images/icons/16/field-number.png" ); }
-	&.fieldicon-sort            { background-image: url( "/keystone/images/icons/16/field-sort.png" ); }
+	&.fieldicon-text            { background-image: url( "@{adminPath}/images/icons/16/field-text.png" ); }
+	&.fieldicon-textarea        { background-image: url( "@{adminPath}/images/icons/16/field-textarea.png" ); }
+	&.fieldicon-name            { background-image: url( "@{adminPath}/images/icons/16/field-name.png" ); }
+	&.fieldicon-html            { background-image: url( "@{adminPath}/images/icons/16/field-html.png" ); }
+	&.fieldicon-url             { background-image: url( "@{adminPath}/images/icons/16/field-url.png" ); }
+	&.fieldicon-key             { background-image: url( "@{adminPath}/images/icons/16/field-key.png" ); }
+	&.fieldicon-email           { background-image: url( "@{adminPath}/images/icons/16/field-email.png" ); }
+	&.fieldicon-select          { background-image: url( "@{adminPath}/images/icons/16/field-select.png" ); }
+	&.fieldicon-location        { background-image: url( "@{adminPath}/images/icons/16/field-location.png" ); }
+	&.fieldicon-boolean         { background-image: url( "@{adminPath}/images/icons/16/field-boolean.png" ); }
+	&.fieldicon-cloudinaryimage { background-image: url( "@{adminPath}/images/icons/16/field-image.png" ); }
+	&.fieldicon-s3file          { background-image: url( "@{adminPath}/images/icons/16/field-file.png" ); }
+	&.fieldicon-relationship    { background-image: url( "@{adminPath}/images/icons/16/field-numericSelect.png" ); }
+	&.fieldicon-date            { background-image: url( "@{adminPath}/images/icons/16/field-date.png" ); }
+	&.fieldicon-datetime        { background-image: url( "@{adminPath}/images/icons/16/field-dateTime.png" ); }
+	&.fieldicon-money           { background-image: url( "@{adminPath}/images/icons/16/field-money.png" ); }
+	&.fieldicon-number          { background-image: url( "@{adminPath}/images/icons/16/field-number.png" ); }
+	&.fieldicon-sort            { background-image: url( "@{adminPath}/images/icons/16/field-sort.png" ); }
 }
 .dropdown-menu .fieldicon {
 	margin-right: 10px;
@@ -61,14 +61,90 @@
 	width: 100%;
 }
 
+.Relationship {
+	margin-bottom: 30px;
+}
 
-// col value - crop field content so we maintain one line throught the list table
-
-.ItemList__value {
-	.u-text-truncate();
+.Relationship__noresults {
+	color: #999;
 }
 
 
+// col value - crop field content so we maintain one line throught the list table
+
+.ItemList__value--truncate {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	word-wrap: normal;
+
+	a& {
+		display: inline-block;
+	}
+}
+
+
+
+
+// List Management
+// ------------------------------
+
+.ItemList__row--manage {
+	// make it obvious that the row is now selectable
+	color: @gray;
+
+	// stop text selection whilst row is in manage mode
+	-webkit-touch-callout: none;
+	  -webkit-user-select: none;
+		 -moz-user-select: none;
+		  -ms-user-select: none;
+			  user-select: none;
+
+	// apply selectable styles to anchors
+	a {
+		color: inherit;
+		pointer-events: none;
+	}
+
+	// highlight the row on hover
+	&:hover {
+		color: @text-color;
+
+		.ItemList__control--check {
+			color: @app-primary;
+		}
+	}
+}
+.ItemList__row--selected {
+	background-color: white;
+	color: @text-color;
+
+	> td:first-child {
+		box-shadow: -2px 0 0 @app-primary;
+	}
+	a {
+		color: inherit;
+	}
+}
+
+
+// Drag and Drop
+// ------------------------------
+
+.ItemList__row--dragging {
+	background-color: white;
+	cursor: move;
+	opacity: 1;
+}
+.ItemList__row--success,
+.ItemList__row--failure {
+	animation: listitem-finished-dragging 1.8s;
+}
+
+@-webkit-keyframes listitem-finished-dragging {
+	from { background-color: #fff6c0; }
+}
 
 
 // Links
@@ -96,90 +172,49 @@
 }
 
 
+// Empty value links
+
+.ItemList__link--empty {
+	color: #999;
+}
+
+
 
 
 // Field Specific
 // ------------------------------
 
 
-// Name Field
+// "First" Field Cols
 // fix an optical illusion that occurs between the row name and the row icon.
 // in most cases the first character of the name col is uppercase, so
 // the icon appears to be too low due the absence of a decender in the row name
 // (they are in fact aligned middle correctly)
 
-.ItemList__value--name {
+.ItemList__value--name,
+.ItemList__value--id {
 	bottom: -1px;
 	position: relative;
 }
 
 
-// ID Field
+// Monospaced Fields
 
-.ItemList__value--id {
-	bottom: -1px; // 1
-	position: relative; // 1
+.ItemList__value--code,
+.ItemList__value--key,
+.ItemList__value--html,
+.ItemList__value--htmlWYSIWYG,
+.ItemList__value--id,
+.ItemList__value--monospace {
 	font-family: @font-family-monospace;
-	font-size: 0.91em;
-
-	.ItemList__control-col + td > & {
-		margin-left: 0 !important; // 2
-	}
 }
 
 
 // __INVALID__ Field
 
 .ItemList__value--invalid {
-	bottom: -1px; // 1
-	position: relative; // 1
 	font-family: @font-family-monospace;
-	font-size: 0.91em;
 	color: @app-danger !important;
-
-	.ItemList__control-col + td > & {
-		margin-left: 0 !important; // 2
-	}
-}
-
-
-// Boolean Field
-
-.ItemList__boolean-check {
-	.align-items(center);
-	.display-flex();
-	.justify-content(center);
-	background: white;
-	color: @input-border-color;
-	border-radius: 3px;
-	border: 1px solid fade(@input-border-color, 50%);
-	width: 20px;
-	height: 20px;
-	text-align: center;
-
-	&.is-checked {
-		color: @input-border-color-focus;
-	}
-}
-
-
-// Colour Field
-
-.ItemList__color-preview {
-	display: inline-block;
-	border-radius: 5px;
-	width: 16px;
-	height: 16px;
-}
-
-
-// Relationship Field
-
-.ItemList__more-indicator {
-	color: #bbb;
-	font-size: @font-size-xs;
-	font-weight: 500;
-	margin-left: .5em;
 }
 
 
@@ -198,6 +233,9 @@
 		-ms-overflow-style: -ms-autohiding-scrollbar;
 		-webkit-overflow-scrolling: touch;
 		width: 100%;
+	}
+	.ItemList__value {
+		max-width: none;
 	}
 
 	// Tighten up spacing for smaller devices

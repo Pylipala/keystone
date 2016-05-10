@@ -3,26 +3,35 @@ import { SegmentedControl } from 'elemental';
 
 const TOGGLE_OPTIONS = [
 	{ label: 'Is Checked', value: true },
-	{ label: 'Is NOT Checked', value: false }
+	{ label: 'Is NOT Checked', value: false },
 ];
 
-var BooleanFilter = React.createClass({
+function getDefaultValue () {
+	return {
+		value: true,
+	};
+}
 
-	getInitialState () {
+var BooleanFilter = React.createClass({
+	propTypes: {
+		filter: React.PropTypes.shape({
+			value: React.PropTypes.bool,
+		}),
+	},
+	statics: {
+		getDefaultValue: getDefaultValue,
+	},
+	getDefaultProps () {
 		return {
-			checked: this.props.value || TOGGLE_OPTIONS[0].value
+			filter: getDefaultValue(),
 		};
 	},
-
-	toggleChecked (checked) {
-		this.setState({
-			checked: checked
-		});
+	updateValue (value) {
+		this.props.onChange({ value });
 	},
 	render () {
-		return <SegmentedControl equalWidthSegments options={TOGGLE_OPTIONS} value={this.state.checked} onChange={this.toggleChecked} />;
-	}
-
+		return <SegmentedControl equalWidthSegments options={TOGGLE_OPTIONS} value={this.props.filter.value} onChange={this.updateValue} />;
+	},
 });
 
 module.exports = BooleanFilter;

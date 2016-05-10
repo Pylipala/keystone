@@ -1,14 +1,31 @@
-var React = require('react');
+import React from 'react';
+import numeral from 'numeral';
+import ItemsTableCell from '../../../admin/client/components/ItemsTable/ItemsTableCell';
+import ItemsTableValue from '../../../admin/client/components/ItemsTable/ItemsTableValue';
 
 var NumberColumn = React.createClass({
-	render: function() {
-		var value = this.props.data.fields[this.props.col.path];
+	displayName: 'NumberColumn',
+	propTypes: {
+		col: React.PropTypes.object,
+		data: React.PropTypes.object,
+	},
+	renderValue () {
+		const value = this.props.data.fields[this.props.col.path];
+		if (!value || isNaN(value)) return null;
+
+		const formattedValue = (this.props.col.path === 'money') ? numeral(value).format('$0,0.00') : value;
+
+		return formattedValue;
+	},
+	render () {
 		return (
-			<td className="ItemList__col">
-				<div className="ItemList__value ItemList__value--number">{ !isNaN(value) ? value : null }</div>
-			</td>
+			<ItemsTableCell>
+				<ItemsTableValue field={this.props.col.type}>
+					{this.renderValue()}
+				</ItemsTableValue>
+			</ItemsTableCell>
 		);
-	}
+	},
 });
 
 module.exports = NumberColumn;

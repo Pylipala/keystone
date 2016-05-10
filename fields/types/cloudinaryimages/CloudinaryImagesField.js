@@ -1,9 +1,24 @@
-import _ from 'underscore';
+import _ from 'lodash';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Field from '../Field';
 import { Button, FormField, FormInput, FormNote } from 'elemental';
+import Lightbox from '../../../admin/client/components/Lightbox';
+import classnames from 'classnames';
 
 const SUPPORTED_TYPES = ['image/gif', 'image/png', 'image/jpeg', 'image/bmp', 'image/x-icon', 'application/pdf', 'image/x-tiff', 'image/x-tiff', 'application/postscript', 'image/vnd.adobe.photoshop', 'image/svg+xml'];
+
+const iconClassDeleted = [
+	'delete-pending',
+	'mega-octicon',
+	'octicon-x',
+];
+
+const iconClassQueued = [
+	'img-uploading',
+	'mega-octicon',
+	'octicon-cloud-upload',
+];
 
 var Thumbnail = React.createClass({
 	displayName: 'CloudinaryImagesFieldThumbnail',
@@ -12,6 +27,7 @@ var Thumbnail = React.createClass({
 		deleted: React.PropTypes.bool,
 		height: React.PropTypes.number,
 		isQueued: React.PropTypes.bool,
+		openLightbox: React.PropTypes.func,
 		shouldRenderActionButton: React.PropTypes.bool,
 		toggleDelete: React.PropTypes.func,
 		url: React.PropTypes.string,
@@ -24,34 +40,31 @@ var Thumbnail = React.createClass({
 	},
 
 	render () {
-		var iconClassName;
+		let iconClassName;
+		const { deleted, height, isQueued, url, width, openLightbox } = this.props;
+		const previewClassName = classnames('image-preview', {
+			action: (deleted || isQueued),
+		});
+		const title = (width && height) ? (width + ' × ' + height) : '';
 
-		if (this.props.deleted) {
-			iconClassName = 'delete-pending mega-octicon octicon-x';
-		} else if (this.props.isQueued) {
-			iconClassName = 'img-uploading mega-octicon octicon-cloud-upload';
+		if (deleted) {
+			iconClassName = classnames(iconClassDeleted);
+		} else if (isQueued) {
+			iconClassName = classnames(iconClassQueued);
 		}
-
-		var previewClassName = 'image-preview';
-		if (this.props.deleted || this.props.isQueued) previewClassName += ' action';
-
-		var title = '';
-		var width = this.props.width;
-		var height = this.props.height;
-		if (width && height) title = width + ' x ' + height;
 
 		return (
 			<div className="image-field image-sortable" title={title}>
 				<div className={previewClassName}>
-					<a href={this.props.url} className="img-thumbnail" target="__blank">
-						<img style={{ height: '90' }} className="img-load" src={this.props.url} />
+					<a href={url} onClick={openLightbox} className="img-thumbnail">
+						<img style={{ height: '90' }} className="img-load" src={url} />
 						<span className={iconClassName} />
 					</a>
 				</div>
 				{this.renderActionButton()}
 			</div>
 		);
-	}
+	},
 
 });
 
@@ -61,14 +74,44 @@ module.exports = Field.create({
 		var thumbnails = [];
 		var self = this;
 
-		_.each(this.props.value, function (item) {
+		_.forEach(this.props.value, function (item) {
 			self.pushThumbnail(item, thumbnails);
 		});
 
 		return { thumbnails: thumbnails };
 	},
 
-	removeThumbnail  (i) {
+	openLightbox (index) {
+		event.preventDefault();
+		this.setState({
+			lightboxIsVisible: true,
+			lightboxImageIndex: index,
+		});
+	},
+
+	closeLightbox () {
+		this.setState({
+			lightboxIsVisible: false,
+			lightboxImageIndex: null,
+		});
+	},
+
+	renderLightbox () {
+		if (!this.props.value || !this.props.value.length) return;
+
+		const images = this.props.value.map(image => image.url);
+
+		return (
+			<Lightbox
+				images={images}
+				initialImage={this.state.lightboxImageIndex}
+				isOpen={this.state.lightboxIsVisible}
+				onCancel={this.closeLightbox}
+			/>
+		);
+	},
+
+	removeThumbnail (i) {
 		var thumbs = this.state.thumbnails;
 		var thumb = thumbs[i];
 
@@ -81,22 +124,23 @@ module.exports = Field.create({
 		this.setState({ thumbnails: thumbs });
 	},
 
-	pushThumbnail  (args, thumbs) {
+	pushThumbnail (args, thumbs) {
 		thumbs = thumbs || this.state.thumbnails;
 		var i = thumbs.length;
 		args.toggleDelete = this.removeThumbnail.bind(this, i);
 		args.shouldRenderActionButton = this.shouldRenderField();
+		args.openLightbox = this.openLightbox.bind(this, i);
 		thumbs.push(<Thumbnail key={i} {...args} />);
 	},
 
 	fileFieldNode () {
-		return this.refs.fileField.getDOMNode();
+		return ReactDOM.findDOMNode(this.refs.fileField);
 	},
 
-	getCount  (key) {
+	getCount (key) {
 		var count = 0;
 
-		_.each(this.state.thumbnails, function (thumb) {
+		_.forEach(this.state.thumbnails, function (thumb) {
 			if (thumb && thumb.props[key]) count++;
 		});
 
@@ -115,16 +159,16 @@ module.exports = Field.create({
 		this.setState({
 			thumbnails: this.state.thumbnails.filter(function (thumb) {
 				return !thumb.props.isQueued;
-			})
+			}),
 		});
 	},
 
-	uploadFile  (event) {
+	uploadFile (event) {
 		var self = this;
 
 		var files = event.target.files;
-		_.each(files, function (f) {
-			if (!_.contains(SUPPORTED_TYPES, f.type)) {
+		_.forEach(files, function (f) {
+			if (!_.includes(SUPPORTED_TYPES, f.type)) {
 				alert('Unsupported file type. Supported formats are: GIF, PNG, JPG, BMP, ICO, PDF, TIFF, EPS, PSD, SVG');
 				return;
 			}
@@ -162,12 +206,12 @@ module.exports = Field.create({
 			var imageText = count === 1 ? 'image' : 'images';
 
 			body.push(<div key={queueType + '-toolbar'} className={queueType + '-queued' + ' u-float-left'}>
-				<FormInput noedit>{count} {imageText} {action} - save to confirm</FormInput>
+				<FormInput noedit>{count} {imageText} {action}</FormInput>
 			</div>);
 		};
 
-		push('upload', 'success', this.getCount('isQueued'), 'queued for upload');
-		push('delete', 'danger', this.getCount('deleted'), 'removed');
+		push('upload', 'success', this.getCount('isQueued'), 'selected - save to upload');
+		push('delete', 'danger', this.getCount('deleted'), 'removed - save to confirm');
 
 		var clearFilesButton;
 		if (this.hasFiles()) {
@@ -177,7 +221,7 @@ module.exports = Field.create({
 		return (
 			<div className="images-toolbar">
 				<div className="u-float-left">
-					<Button onClick={this.changeImage}>Select files</Button>
+					<Button onClick={this.changeImage}>Upload Images</Button>
 					{clearFilesButton}
 				</div>
 				{body}
@@ -187,7 +231,7 @@ module.exports = Field.create({
 
 	renderPlaceholder () {
 		return (
-			<div className="image-field image-upload" onClick={this.changeImage}>
+			<div className="image-field image-field--upload" onClick={this.changeImage}>
 				<div className="image-preview">
 					<span className="img-thumbnail">
 						<span className="img-dropzone" />
@@ -215,7 +259,7 @@ module.exports = Field.create({
 
 		var value = '';
 		var remove = [];
-		_.each(this.state.thumbnails, function (thumb) {
+		_.forEach(this.state.thumbnails, function (thumb) {
 			if (thumb && thumb.props.deleted) remove.push(thumb.props.public_id);
 		});
 		if (remove.length) value = 'remove:' + remove.join(',');
@@ -230,8 +274,7 @@ module.exports = Field.create({
 	},
 
 	renderNote () {
-		if (!this.props.note) return null;
-		return <FormNote note={this.props.note} />;
+		return this.props.note ? <FormNote note={this.props.note} /> : null;
 	},
 
 	renderUI () {
@@ -243,7 +286,8 @@ module.exports = Field.create({
 				{this.renderContainer()}
 				{this.renderToolbar()}
 				{this.renderNote()}
+				{this.renderLightbox()}
 			</FormField>
 		);
-	}
+	},
 });

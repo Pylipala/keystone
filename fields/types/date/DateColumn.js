@@ -1,16 +1,34 @@
-var React = require('react');
-var moment = require('moment');
+import React from 'react';
+import moment from 'moment';
+import ItemsTableCell from '../../../admin/client/components/ItemsTable/ItemsTableCell';
+import ItemsTableValue from '../../../admin/client/components/ItemsTable/ItemsTableValue';
 
 var DateColumn = React.createClass({
-	render: function() {
-		var value = this.props.data.fields[this.props.col.path];
-		var formattedValue = moment(value).format('MMMM Do YYYY');
+	displayName: 'DateColumn',
+	propTypes: {
+		col: React.PropTypes.object,
+		data: React.PropTypes.object,
+	},
+	renderValue () {
+		const value = this.props.data.fields[this.props.col.path];
+		if (!value) return null;
+
+		const format = (this.props.col.type === 'datetime') ? 'MMMM Do YYYY, h:mm:ss a' : 'MMMM Do YYYY';
+		const formattedValue = moment(value).format(format);
+
 		return (
-			<td className="ItemList__col">
-				<div className="ItemList__value ItemList__value--date">{formattedValue ? formattedValue : null}</div>
-			</td>
+			<ItemsTableValue title={formattedValue} field={this.props.col.type}>
+				{formattedValue}
+			</ItemsTableValue>
 		);
-	}
+	},
+	render () {
+		return (
+			<ItemsTableCell>
+				{this.renderValue()}
+			</ItemsTableCell>
+		);
+	},
 });
 
 module.exports = DateColumn;

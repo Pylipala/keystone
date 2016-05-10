@@ -1,5 +1,6 @@
 import Field from '../Field';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Button, FormField, FormInput, FormNote } from 'elemental';
 
 module.exports = Field.create({
@@ -9,11 +10,11 @@ module.exports = Field.create({
 	},
 
 	fileFieldNode () {
-		return this.refs.fileField.getDOMNode();
+		return ReactDOM.findDOMNode(this.refs.fileField);
 	},
 
 	changeFile () {
-		this.refs.fileField.getDOMNode().click();
+		this.fileFieldNode().click();
 	},
 
 	getFileSource () {
@@ -36,22 +37,22 @@ module.exports = Field.create({
 		this.fileFieldNode().value = '';
 		this.setState({
 			removeExisting: false,
-			localSource:    null,
-			origin:         false,
-			action:         null
+			localSource: null,
+			origin: false,
+			action: null,
 		});
 	},
 
-	fileChanged  (event) {//eslint-disable-line no-unused-vars
+	fileChanged (event) { // eslint-disable-line no-unused-vars
 		this.setState({
-			origin: 'local'
+			origin: 'local',
 		});
 	},
 
-	removeFile  (e) {
+	removeFile (e) {
 		var state = {
 			localSource: null,
-			origin: false
+			origin: false,
 		};
 
 		if (this.hasLocal()) {
@@ -97,19 +98,19 @@ module.exports = Field.create({
 		}
 	},
 
-	renderFileDetails  (add) {
+	renderFileDetails (add) {
 		var values = null;
 
 		if (this.hasFile() && !this.state.removeExisting) {
 			values = (
-				<div className='file-values'>
+				<div className="file-values">
 					<FormInput noedit>{this.getFilename()}</FormInput>
 				</div>
 			);
 		}
 
 		return (
-			<div key={this.props.path + '_details'} className='file-details'>
+			<div key={this.props.path + '_details'} className="file-details">
 				{values}
 				{add}
 			</div>
@@ -176,8 +177,8 @@ module.exports = Field.create({
 
 	renderFileToolbar () {
 		return (
-			<div key={this.props.path + '_toolbar'} className='file-toolbar'>
-				<div className='u-float-left'>
+			<div key={this.props.path + '_toolbar'} className="file-toolbar">
+				<div className="u-float-left">
 					<Button onClick={this.changeFile}>
 						{this.hasFile() ? 'Change' : 'Upload'} File
 					</Button>
@@ -223,6 +224,6 @@ module.exports = Field.create({
 
 			</FormField>
 		);
-	}
+	},
 
 });

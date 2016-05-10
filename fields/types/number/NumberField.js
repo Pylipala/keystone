@@ -1,11 +1,10 @@
-var React = require('react'),
-	Field = require('../Field');
+import React from 'react';
+import Field from '../Field';
+import { FormInput } from 'elemental';
 
 module.exports = Field.create({
-	
 	displayName: 'NumberField',
-	
-	valueChanged: function(event) {
+	valueChanged (event) {
 		var newValue = event.target.value;
 		if (/^-?\d*\.?\d*$/.test(newValue)) {
 			this.props.onChange({
@@ -14,9 +13,15 @@ module.exports = Field.create({
 			});
 		}
 	},
-	
-	renderField: function() {
-		return <input type="text" name={this.props.path} ref="focusTarget" value={this.props.value} onChange={this.valueChanged} autoComplete="off" className="form-control" />;
-	}
-	
+	renderField () {
+		return (
+			<FormInput
+				name={this.props.path}
+				ref="focusTarget"
+				value={this.props.value}
+				onChange={this.valueChanged}
+				autoComplete="off"
+			/>
+		);
+	},
 });

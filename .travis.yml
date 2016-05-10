@@ -4,9 +4,13 @@ node_js:
 
 before_script:
   - npm run lint
+  - sleep 15
 
 script:
   - npm run test-cov
+  - npm run test-e2e-saucelabs
+
+sudo: required
 
 notifications:
   email:
@@ -22,3 +26,11 @@ git:
 cache:
   directories:
     - node_modules
+
+addons:
+  apt:
+    sources:
+      - mongodb-3.0-precise
+    packages:
+      - mongodb-org-server
+  sauce_connect: true

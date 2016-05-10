@@ -16,14 +16,6 @@ KeystoneJS is maintained by [@JedWatson](https://github.com/JedWatson) and an am
 * updated; update tinymce and add the imagetools, thanks [Riyadh Al Nur](https://github.com/riyadhalnur)
 * fixed; show notes in boolean field, thanks [Camille Reynders](https://github.com/creynders)
 
-## v0.3.16 / 2015-12-04
-
-* fixed; issues deleting real files on disk for the `LocalFiles` field type, thanks [Javier Castro](https://github.com/jacargentina)
-* fixed; issue with `filenameAsPublicID` in `CloudinaryImages`, thanks [Jeffrey Priebe](https://github.com/jeffreypriebe)
-* fixed; issue with signin validation, thanks [Greg Meyer](https://github.com/gmmeyer)
-
-Given the nature of the signin issue that was resolved in this release, we strongly recommend updating to this version as soon as possible.
-
 ## v0.3.15 / 2015-10-15
 
 * added; new hooks in the app middleware setup are available, see [#1736](https://github.com/keystonejs/keystone/issues/1736) for documentation.
