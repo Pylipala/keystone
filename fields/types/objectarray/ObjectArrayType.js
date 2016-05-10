@@ -78,7 +78,7 @@ objectarray.prototype.validateInput = function(data, required, item) {
  * @api public
  */
 
-objectarray.prototype.updateItem = function(item, data) {
+objectarray.prototype.updateItem = function(item, data, callback) {
 	var value = this.getValueFromData(data);
 
 	if (typeof value === 'undefined' || value === null || !value) {
@@ -90,6 +90,8 @@ objectarray.prototype.updateItem = function(item, data) {
 	} else {
 		item.set(this.path, []);
 	}
+
+	callback();
 };
 
 /*!
