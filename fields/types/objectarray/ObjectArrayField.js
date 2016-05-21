@@ -124,7 +124,6 @@ module.exports = Field.create({
 		switch (part.type) {
 			case 'select':
 			case 'relationship':
-				input = React.createElement(Fields[part.type], props);
 			case 'number':
 			case 'text':
 			case 'email':
@@ -136,14 +135,9 @@ module.exports = Field.create({
 			case 'color':
 			case 'month':
 			case 'week':
-				break;
-
 			case 'textarea':
-				input = <textarea ref={obj.key} className='form-control multi' name={fieldName} value={obj.value} autoComplete='off' onChange={this.updateItem.bind(this, obj, objIndex, parentIndex)} />;
-				break;
-
 			default:
-				<input ref={obj.key} className='form-control multi' type='text' name={fieldName} value={obj.value} autoComplete='off' onChange={this.updateItem.bind(this, obj, objIndex, parentIndex)} />;
+				input = React.createElement(Fields[part.type], props);
 		}
 
 		return (
