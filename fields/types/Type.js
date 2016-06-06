@@ -327,10 +327,11 @@ Field.prototype.inputIsValid = function (data, required, item) {
 	if (!required) return true;
 	var value = this.getValueFromData(data);
 	if (value === undefined && item && item.get(this.path)) return true;
-	if (typeof data[this.path] === 'string') {
-		return (data[this.path].trim()) ? true : false;
+	var fieldValue = _.get(data, this.path);
+    if (typeof fieldValue === 'string') {
+		return (fieldValue.trim()) ? true : false;
 	} else {
-		return (data[this.path]) ? true : false;
+		return (fieldValue) ? true : false;
 	}
 };
 

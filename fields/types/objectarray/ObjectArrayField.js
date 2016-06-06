@@ -142,9 +142,6 @@ module.exports = Field.create({
 
 		return (
 			<div key={obj.key}>
-				<label className='label'>
-					{obj.label || obj.fieldName}
-				</label>
 				{input}
 			</div>
 		);
@@ -170,7 +167,7 @@ module.exports = Field.create({
 		return (
 			<div>
 				{this.state.values.map(this.renderItem)}
-				<button type="button" className='btn btn-xs btn-default' onClick={this.addItem}>Add item</button>
+				<button type="success" className='btn btn-xs btn-default' onClick={this.addItem}>Add item</button>
 			</div>
 		);
 	},

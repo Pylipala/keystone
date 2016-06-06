@@ -30,4 +30,5 @@ module.exports = {
 	textarray: require('../../fields/types/textarray/TextArrayField'),
 	url: require('../../fields/types/url/UrlField'),
 	objectarray: require('../../fields/types/objectarray/ObjectArrayField'),
+	nestedobject: require('../../fields/types/nestedobject/NestedObjectField'),
 };
