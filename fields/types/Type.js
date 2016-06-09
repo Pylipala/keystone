@@ -238,9 +238,10 @@ definePrototypeGetters(Field, {
  * Default method to register the field on the List's Mongoose Schema.
  * Overridden by some fieldType Classes
  */
-Field.prototype.addToSchema = function () {
+Field.prototype.addToSchema = function (parentSchemaParam) {
 	var ops = (this._nativeType) ? _.defaults({ type: this._nativeType }, this.options) : this.options;
-	this.list.schema.path(this.path, ops);
+	var parentSchema = parentSchemaParam || this.list.schema;
+	parentSchema.path(this.path, ops);
 	this.bindUnderscoreMethods();
 };
 

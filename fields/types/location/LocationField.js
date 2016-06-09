@@ -93,7 +93,7 @@ module.exports = Field.create({
 		}
 		return (
 			<FormField label={label} className="form-field--secondary" htmlFor={this.props.path + '.' + path}>
-				<FormInput name={this.props.path + '.' + path} ref={path} value={this.props.value[path]} onChange={this.fieldChanged.bind(this, path)} placeholder={label} />
+				<FormInput name={this.props.path + '[' + path + ']'} ref={path} value={this.props.value[path]} onChange={this.fieldChanged.bind(this, path)} placeholder={label} />
 			</FormField>
 		);
 	},
@@ -103,10 +103,10 @@ module.exports = Field.create({
 			<FormField label="Suburb / State" className="form-field--secondary" htmlFor={this.props.path + '.suburb'}>
 				<FormRow>
 					<FormField width="two-thirds" className="form-field--secondary">
-						<FormInput name={this.props.path + '.suburb'} ref="suburb" value={this.props.value.suburb} onChange={this.fieldChanged.bind(this, 'suburb')} placeholder="Suburb" />
+						<FormInput name={this.props.path + '[suburb]'} ref="suburb" value={this.props.value.suburb} onChange={this.fieldChanged.bind(this, 'suburb')} placeholder="Suburb" />
 					</FormField>
 					<FormField width="one-third" className="form-field--secondary">
-						<FormInput name={this.props.path + '.state'} ref="state" value={this.props.value.state} onChange={this.fieldChanged.bind(this, 'state')} placeholder="State" />
+						<FormInput name={this.props.path + '[state]'} ref="state" value={this.props.value.state} onChange={this.fieldChanged.bind(this, 'state')} placeholder="State" />
 					</FormField>
 				</FormRow>
 			</FormField>
@@ -118,10 +118,10 @@ module.exports = Field.create({
 			<FormField label="Postcode / Country" className="form-field--secondary" htmlFor={this.props.path + '.postcode'}>
 				<FormRow>
 					<FormField width="one-third" className="form-field--secondary">
-						<FormInput name={this.props.path + '.postcode'} ref="postcode" value={this.props.value.postcode} onChange={this.fieldChanged.bind(this, 'postcode')} placeholder="Post Code" />
+						<FormInput name={this.props.path + '[postcode]'} ref="postcode" value={this.props.value.postcode} onChange={this.fieldChanged.bind(this, 'postcode')} placeholder="Post Code" />
 					</FormField>
 					<FormField width="two-thirds" className="form-field--secondary">
-						<FormInput name={this.props.path + '.country'} ref="country" value={this.props.value.country} onChange={this.fieldChanged.bind(this, 'country')} placeholder="Country" />
+						<FormInput name={this.props.path + '[country]'} ref="country" value={this.props.value.country} onChange={this.fieldChanged.bind(this, 'country')} placeholder="Country" />
 					</FormField>
 				</FormRow>
 			</FormField>

@@ -6,7 +6,8 @@ var util = require('util'),
 	utils = require('keystone-utils'),
 	Schema = require('mongoose').Schema,
 	super_ = require('../Type'),
-	_ = require('underscore');
+	_ = require('underscore'),
+	async = require('async');
 
 /**
  * ObjectArray FieldType Constructor
@@ -43,6 +44,19 @@ objectarray.prototype.getProperties = function () {
 	return {
 		partsOptions: this.partsOptions
 	};
+};
+
+objectarray.prototype.addToSchema = function (parentSchemaParam) {
+	var ops = (this._nativeType) ? _.defaults({ type: this._nativeType }, this.options) : this.options;
+	var parentSchema = parentSchemaParam || this.list.schema;
+	var objSchema = new Schema({});
+	_.each(this.parts, (function(fieldOption, fieldName){
+		fieldOption.isNestedField = true;
+		var childField = new fieldOption.type(this.list, fieldName, fieldOption);
+		childField.addToSchema(objSchema);
+	}).bind(this));
+	parentSchema.path(this.path, [objSchema]);
+	this.bindUnderscoreMethods();
 };
 
 /**
@@ -88,11 +102,20 @@ objectarray.prototype.updateItem = function(item, data, callback) {
 
 	if (Array.isArray(value)) {
 		item.set(this.path, value);
+		async.times(value.length, (function(index, callback){
+			async.each(_.keys(this.parts), (function(fieldName, callback){
+				var fieldOption = this.parts[fieldName];
+				fieldOption.isNestedField = true;
+				var childField = new fieldOption.type(this.list, fieldName, fieldOption);
+				childField.updateItem(item[this.path][index], value[index], callback);
+			}).bind(this), function(){
+				callback();
+			})
+		}).bind(this), callback);
 	} else {
 		item.set(this.path, []);
+		callback();
 	}
-
-	callback();
 };
 
 /*!

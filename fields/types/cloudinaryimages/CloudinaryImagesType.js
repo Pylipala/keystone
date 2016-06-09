@@ -85,12 +85,12 @@ cloudinaryimages.prototype.getFolder = function () {
  *
  * @api public
  */
-cloudinaryimages.prototype.addToSchema = function () {
+cloudinaryimages.prototype.addToSchema = function (parentSchema) {
 
 	var mongoose = keystone.mongoose;
 
 	var field = this;
-	var schema = this.list.schema;
+	var schema = parentSchema || this.list.schema;
 
 	this.paths = {
 		// virtuals

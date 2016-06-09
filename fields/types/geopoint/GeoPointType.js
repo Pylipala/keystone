@@ -23,8 +23,9 @@ util.inherits(geopoint, FieldType);
  * Registers the field on the List's Mongoose Schema.
  * Adds a 2dsphere indexed lat/lng pair
  */
-geopoint.prototype.addToSchema = function () {
-	this.list.schema.path(this.path, _.defaults({ type: [Number], index: '2dsphere' }, this.options));
+geopoint.prototype.addToSchema = function (parentSchema) {
+	var schema = parentSchema || this.list.schema;
+	schema.path(this.path, _.defaults({ type: [Number], index: '2dsphere' }, this.options));
 	this.bindUnderscoreMethods();
 };
 

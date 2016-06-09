@@ -65,10 +65,10 @@ Object.defineProperty(azurefile.prototype, 'azurefileconfig', {
 /**
  * Registers the field on the List's Mongoose Schema.
  */
-azurefile.prototype.addToSchema = function () {
+azurefile.prototype.addToSchema = function (parentSchema) {
 
 	var field = this;
-	var schema = this.list.schema;
+	var schema = parentSchema || this.list.schema;
 
 	var paths = this.paths = {
 		// fields

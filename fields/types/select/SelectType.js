@@ -51,9 +51,9 @@ util.inherits(select, FieldType);
  * and statics to the Schema for converting a value to a label,
  * and retrieving all of the defined options.
  */
-select.prototype.addToSchema = function () {
+select.prototype.addToSchema = function (parentSchema) {
 	var field = this;
-	var schema = this.list.schema;
+	var schema = parentSchema || this.list.schema;
 	this.paths = {
 		data: this.options.dataPath || this._path.append('Data'),
 		label: this.options.labelPath || this._path.append('Label'),

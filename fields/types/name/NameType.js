@@ -25,8 +25,8 @@ util.inherits(name, FieldType);
  *
  * @api public
  */
-name.prototype.addToSchema = function () {
-	var schema = this.list.schema;
+name.prototype.addToSchema = function (parentSchema) {
+	var schema = parentSchema || this.list.schema;
 	var paths = this.paths = {
 		first: this._path.append('.first'),
 		last: this._path.append('.last'),

@@ -39,18 +39,35 @@ function location (list, path, options) {
 	if (!this.requiredPaths) {
 		this.requiredPaths = ['street1', 'suburb'];
 	}
-
+	
 	location.super_.call(this, list, path, options);
+	
+	this.paths = {
+		number: this._path.append('.number'),
+		name: this._path.append('.name'),
+		street1: this._path.append('.street1'),
+		street2: this._path.append('.street2'),
+		suburb: this._path.append('.suburb'),
+		state: this._path.append('.state'),
+		postcode: this._path.append('.postcode'),
+		country: this._path.append('.country'),
+		geo: this._path.append('.geo'),
+		geo_lat: this._path.append('.geo_lat'),
+		geo_lng: this._path.append('.geo_lng'),
+		serialised: this._path.append('.serialised'),
+		improve: this._path.append('_improve'),
+		overwrite: this._path.append('_improve_overwrite'),
+	};
 }
 util.inherits(location, FieldType);
 
 /**
  * Registers the field on the List's Mongoose Schema.
  */
-location.prototype.addToSchema = function () {
+location.prototype.addToSchema = function (parentSchema) {
 
 	var field = this;
-	var schema = this.list.schema;
+	var schema = parentSchema || this.list.schema;
 	var options = this.options;
 
 	var paths = this.paths = {

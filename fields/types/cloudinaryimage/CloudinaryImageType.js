@@ -80,10 +80,10 @@ cloudinaryimage.prototype.getFolder = function () {
  *
  * @api public
  */
-cloudinaryimage.prototype.addToSchema = function () {
+cloudinaryimage.prototype.addToSchema = function (parentSchema) {
 
 	var field = this;
-	var schema = this.list.schema;
+	var schema = parentSchema || this.list.schema;
 
 	var paths = this.paths = {
 		// cloudinary fields
