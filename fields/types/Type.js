@@ -78,7 +78,9 @@ function Field (list, path, options) {
 	}
 
 	// Add the field to the schema
-	this.addToSchema();
+	if(! this.options.isNestedField){
+		this.addToSchema();
+	}
 
 	// Add pre-save handler to the list if this field watches others
 	if (this.options.watch) {

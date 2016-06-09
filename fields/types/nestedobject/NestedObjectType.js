@@ -36,6 +36,7 @@ util.inherits(nestedobject, super_);
  */
 nestedobject.prototype.getProperties = function () {
 	this.partsOptions = this.partsOptions || _.mapObject(this.parts, function(fieldOption, fieldName){
+			fieldOption.isNestedField = true;
 		return new fieldOption.type(this.list, fieldName, fieldOption).getOptions();
 	}, this);
 
