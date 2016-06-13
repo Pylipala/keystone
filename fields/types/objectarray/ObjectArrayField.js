@@ -167,7 +167,7 @@ module.exports = Field.create({
 		return (
 			<div>
 				{this.state.values.map(this.renderItem)}
-				<button type="success" className='btn btn-xs btn-default' onClick={this.addItem}>Add item</button>
+				<button type="button" className='btn btn-xs btn-default' onClick={this.addItem}>Add item</button>
 			</div>
 		);
 	},

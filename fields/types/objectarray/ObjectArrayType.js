@@ -96,8 +96,8 @@ objectarray.prototype.validateInput = function(data, required, item) {
 objectarray.prototype.updateItem = function(item, data, callback) {
 	var value = this.getValueFromData(data);
 
-	if (typeof value === 'undefined' || value === null || !value) {
-		value = [];
+	if (typeof value === 'undefined') {
+		return callback();
 	}
 
 	if (Array.isArray(value)) {
