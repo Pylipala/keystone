@@ -55,6 +55,7 @@ module.exports = function createApp (keystone, express) {
 	require('./bindStylusMiddleware')(keystone, app);
 	require('./bindStaticMiddleware')(keystone, app);
 	require('./bindSessionMiddleware')(keystone, app);
+	require('./bindRequestLoggerMiddleware')(keystone, app);
 
 	// Log dynamic requests
 	if (keystone.get('logger')) {
