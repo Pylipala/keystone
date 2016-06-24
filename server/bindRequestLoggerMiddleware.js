@@ -2,11 +2,10 @@
  * Created by liulun on 16/6/16.
  */
 var _ = require('lodash');
-var Cls = require('continuation-local-storage');
-var ClsMongoose = require('cls-mongoose');
-var ClsBlueBird = require('cls-bluebird');
-var ClsEs6 = require('cls-es6-promise');
+//var Cls = require('continuation-local-storage');
 var util = require('util');
+const domain = require('domain');
+const process = require('process');
 
 module.exports = function bindStaticMiddleware (keystone, app) {
 	var option = keystone.get('requestLogger');
@@ -14,16 +13,6 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 	if(! option){
 		return;
 	}
-
-	var sessionNs = Cls.createNamespace('keystone.session');
-
-	var mongoose = require('mongoose');
-	ClsMongoose(sessionNs);
-
-	ClsBlueBird(sessionNs, require('bluebird'));
-
-	var Promise = require('es6-promise').Promise;
-	ClsEs6(sessionNs);
 
 	var requestLoggerOption = _.defaults({}, option, {
 		requestModelName: 'RequestRecord',
@@ -101,7 +90,7 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 
 			RequestRecord.relationship({ ref: 'LogRecord', path: 'logRecords', refPath: 'requestRecord' });
 
-		return {RequestRecord:RequestRecord, LogRecord:LogRecord};
+			return {RequestRecord:RequestRecord, LogRecord:LogRecord};
         }
 
 	var logModels = defineLogModels();
@@ -121,6 +110,7 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 			if(! requestLoggerOption.replaceConsoleLog){
 				console.error(error);
 			}else{
+				console.error('Save log meet error!!!');
 				console.old_error(error);
 			}
 		}
@@ -135,8 +125,9 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 			if(args.length == 1 && !args[0]){
 				return;
 			}
-			var sessionNs = Cls.getNamespace('keystone.session');
-			var requestRecord = sessionNs.get('requestRecord');
+			//var sessionNs = Cls.getNamespace('keystone.session');
+			var d = process.domain;
+			var requestRecord = d ? d.requestRecord : null;
 			var requestLogLevel = requestRecord ? requestRecord.logLevel : 'info';
 			if(levelMap[level] < levelMap[requestLogLevel]){
 				return;
@@ -178,7 +169,10 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 				&& req.params['perRequestLogLevelToken'] == requestLoggerOption.perRequestLogLevelToken){
 			logLevel = logLevelInReq;
 		}
-		var sessionNs = Cls.getNamespace('keystone.session');
+		//var sessionNs = Cls.getNamespace('keystone.session');
+		var d = domain.create();
+		d.add(req);
+		d.add(res);
 		var requestRecord = new logModels.RequestRecord.model({
 			requestTime: new Date(),
 			remoteAddress: req.ip,
@@ -191,9 +185,8 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 			processTime: null,
 			logLevel: logLevel,
 		});
-		requestRecord.save(saveCallback);
 
-		var onReqEnd = function(){
+		var onReqEnd = d.bind(function(){
 			var endTime = new Date();
 			logModels.RequestRecord.updateItem(requestRecord, {
 				user: req.user ? req.user._id : undefined,
@@ -201,16 +194,18 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 				responseTime: endTime,
 				processTime: endTime - requestRecord.requestTime,
 			}, saveCallback);
-		};
+		});
 
 		res.on('close', onReqEnd);
 		res.on('finish', onReqEnd);
 
-		sessionNs.bindEmitter(req);
-		sessionNs.bindEmitter(res);
+		//sessionNs.bindEmitter(req);
+		//sessionNs.bindEmitter(res);
 
-		sessionNs.run(function(){
-			sessionNs.set('requestRecord', requestRecord);
+		d.run(function(){
+			//sessionNs.set('requestRecord', requestRecord);
+			d.requestRecord = requestRecord;
+			requestRecord.save(saveCallback);
 			next();
 		});
 	});
