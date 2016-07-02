@@ -2,7 +2,6 @@
  * Created by liulun on 16/6/16.
  */
 var _ = require('lodash');
-//var Cls = require('continuation-local-storage');
 var util = require('util');
 const domain = require('domain');
 const process = require('process');
@@ -155,7 +154,6 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 			if(args.length == 1 && !args[0]){
 				return;
 			}
-			//var sessionNs = Cls.getNamespace('keystone.session');
 			var d = process.domain;
 			var requestRecord = d ? d.requestRecord : null;
 			var requestLogLevel = requestRecord ? requestRecord.logLevel : 'info';
@@ -199,7 +197,6 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 				&& req.params['perRequestLogLevelToken'] == requestLoggerOption.perRequestLogLevelToken){
 			logLevel = logLevelInReq;
 		}
-		//var sessionNs = Cls.getNamespace('keystone.session');
 		var d = domain.create();
 		d.add(req);
 		d.add(res);
@@ -228,10 +225,7 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 
 		res.on('close', onReqEnd);
 		res.on('finish', onReqEnd);
-
-		//sessionNs.bindEmitter(req);
-		//sessionNs.bindEmitter(res);
-
+		
 		d.run(function(){
 			//sessionNs.set('requestRecord', requestRecord);
 			d.requestRecord = requestRecord;
