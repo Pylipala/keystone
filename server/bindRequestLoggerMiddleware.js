@@ -225,9 +225,8 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 
 		res.on('close', onReqEnd);
 		res.on('finish', onReqEnd);
-		
+
 		d.run(function(){
-			//sessionNs.set('requestRecord', requestRecord);
 			d.requestRecord = requestRecord;
 			requestRecord.save(saveCallback);
 			next();
