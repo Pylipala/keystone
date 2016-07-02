@@ -31,7 +31,12 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 		var clone = _.cloneDeep(body);
 
 		if(requestLoggerOption.bodyLogFilter){
-			clone = requestLoggerOption.bodyLogFilter(method, url, clone);
+			try{
+				clone = requestLoggerOption.bodyLogFilter(method, url, clone);
+			}catch(e){
+				console.error('escapeSensitiveData meet error:');
+				console.error(e);
+			}
 		}
 
 		if(url == '/' + keystone.get('admin path') + '/api/session/signin'){
