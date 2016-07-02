@@ -54,8 +54,19 @@ module.exports = function createApp (keystone, express) {
 	require('./bindSassMiddleware')(keystone, app);
 	require('./bindStylusMiddleware')(keystone, app);
 	require('./bindStaticMiddleware')(keystone, app);
-	require('./bindSessionMiddleware')(keystone, app);
+
+	// Pre bodyparser middleware
+	if (typeof keystone.get('pre:bodyparser') === 'function') {
+		keystone.get('pre:bodyparser')(app);
+	}
+	app.use(function (req, res, next) {
+		keystone.callHook('pre:bodyparser', req, res, next);
+	});
+
+	require('./bindBodyParser')(keystone, app);
+
 	require('./bindRequestLoggerMiddleware')(keystone, app);
+	require('./bindSessionMiddleware')(keystone, app);
 
 	// Log dynamic requests
 	if (keystone.get('logger')) {
@@ -79,15 +90,6 @@ module.exports = function createApp (keystone, express) {
 		app.use('/' + keystone.get('admin path'), require('../admin/server').createDynamicRouter(keystone));
 	}
 
-	// Pre bodyparser middleware
-	if (typeof keystone.get('pre:bodyparser') === 'function') {
-		keystone.get('pre:bodyparser')(app);
-	}
-	app.use(function (req, res, next) {
-		keystone.callHook('pre:bodyparser', req, res, next);
-	});
-
-	require('./bindBodyParser')(keystone, app);
 	app.use(methodOverride());
 
 	// Set language preferences

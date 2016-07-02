@@ -6,6 +6,7 @@ var _ = require('lodash');
 var util = require('util');
 const domain = require('domain');
 const process = require('process');
+const cu = require('@pylipala.com/chunxiao-util');
 
 module.exports = function bindStaticMiddleware (keystone, app) {
 	var option = keystone.get('requestLogger');
@@ -22,6 +23,30 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 		logLevel: 'info',
 		perRequestLogLevelToken: 'perRequestLogLevelToken'
 	});
+
+	function escapeSensitiveData(method, url, body){
+		if(method != 'POST'){
+			return body;
+		}
+		var clone = _.cloneDeep(body);
+
+		if(requestLoggerOption.bodyLogFilter){
+			clone = requestLoggerOption.bodyLogFilter(method, url, clone);
+		}
+
+		if(url == '/' + keystone.get('admin path') + '/api/session/signin'){
+			if(clone.password){
+				clone.password = '*****';
+			}
+		}else if(new RegExp('/' + keystone.get('admin path') + '/users/.*').exec(url)){
+			if(clone.password){
+				clone.password = '*****';
+				clone.password_confirm = '*****';
+			}
+		}
+		clone = cu.mongoPatch.escapeDotDollar(clone);
+		return clone;
+	}
 
 	keystone.set('requestLoggerOption', requestLoggerOption);
 
@@ -179,7 +204,7 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 			user: req.user ? req.user._id : undefined,
 			requestMethod: req.method,
 			requestUrl: req.url,
-			requestBody: req.body,
+			requestBody: escapeSensitiveData(req.method, req.url, req.body),
 			responseStatus: null,
 			responseTime: null,
 			processTime: null,
