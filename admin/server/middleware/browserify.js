@@ -71,8 +71,11 @@ module.exports = function (file, name) {
 			b = browserify('./' + file, opts);
 		}
 		b.transform(babelify.configure({
-			plugins: [require('babel-plugin-transform-object-rest-spread'), require('babel-plugin-transform-object-assign')],
-			presets: [require('babel-preset-es2015'), require('babel-preset-react')],
+			plugins: [
+				require('babel-plugin-transform-object-rest-spread'),
+				require('babel-plugin-transform-object-assign'),
+				require('babel-plugin-syntax-async-functions')],
+			presets: [require('babel-preset-es2015'), require('babel-preset-react'), require('babel-preset-stage-0')],
 		}));
 		b.exclude('FieldTypes');
 		packages.forEach(function (i) {

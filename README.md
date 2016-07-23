@@ -96,7 +96,7 @@ Running in default mode, Keystone takes care of everything required to configure
 Here is an example of what your `keystone.js` (or `app.js`, etc) file may look like:
 
 ```js
-var keystone = require('keystone');
+var keystone = require('@pylipala.com/keystone');
 
 keystone.init({
 
@@ -168,7 +168,7 @@ Keystone's field types include:
 *	[Text](http://keystonejs.com/docs/database/#fieldtypes-text)
 *	[Textarea](http://keystonejs.com/docs/database/#fieldtypes-textarea)
 *	[Url](http://keystonejs.com/docs/database/#fieldtypes-url)
-*	[Azure File](http://keystonejs.com/docs/database/#fieldtypes-azurefile)  
+*	[Azure File](http://keystonejs.com/docs/database/#fieldtypes-azurefile)
 *	[CloudinaryImage](http://keystonejs.com/docs/database/#fieldtypes-cloudinaryimage)
 *	[CloudinaryImages](http://keystonejs.com/docs/database/#fieldtypes-cloudinaryimages)
 *	[Embedly](http://keystonejs.com/docs/database/#fieldtypes-embedly)
@@ -195,7 +195,7 @@ If you want to test or develop against the `master` branch of KeystoneJS (or aga
 *	From the KeystoneJS directory, run `sudo npm link` (you will need to enter your system password)
 *	From your project directory, e.g. `~/Development/MySite` (the one with your `package.json` file in it) run `npm link keystone`. This will create a link between `~/Development/MySite/node_modules/keystone` and `~/Development/KeystoneJS`.
 
-Then `require('keystone')` normally in your app - the development copy will be used. Note that running `npm update` will ignore new versions of keystone that have been published.
+Then `require('@pylipala.com/keystone')` normally in your app - the development copy will be used. Note that running `npm update` will ignore new versions of keystone that have been published.
 
 To go back to using a published version of KeystoneJS from npm, from your project directory, run `npm unlink keystone` then `npm install`.
 

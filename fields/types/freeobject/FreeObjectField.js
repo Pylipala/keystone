@@ -1,7 +1,7 @@
 var _ = require('underscore'),
 	React = require('react'),
 	Field = require('../Field');
-
+var util = require('@pylipala.com/chunxiao-util');
 
 module.exports = Field.create({
 
@@ -11,8 +11,10 @@ module.exports = Field.create({
 
 		var value = this.props.value;
 
+		var unescapedValue = util.mongoPatch.unescapeDotDollar(value);
+
 		return {
-			value: JSON.stringify(value, null, 4),
+			value: JSON.stringify(unescapedValue, null, 4),
 			hasError: false
 		};
 	},
@@ -44,9 +46,11 @@ module.exports = Field.create({
 			hasError: false
 		});
 
+		var escapedValue = util.mongoPatch.escapeDotDollar(value);
+
 		this.props.onChange({
 			path: this.props.path,
-			value: value
+			value: escapedValue
 		});
 	},
 
