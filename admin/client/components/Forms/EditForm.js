@@ -195,7 +195,7 @@ var EditForm = React.createClass({
 	},
 	renderFooterBar () {
 		var buttons = [
-			<Button key="save" type="primary" submit>Save</Button>,
+			<Button key="save" type="primary" onClick={this.onClickSave}>Save</Button>,
 		];
 		buttons.push(
 			<Button key="reset" onClick={this.confirmReset} type="link-cancel">
@@ -211,10 +211,21 @@ var EditForm = React.createClass({
 		}
 		return (
 			<FooterBar className="EditForm__footer">
-				{buttons}
+				<form method="post" encType="multipart/form-data" className="EditForm-container" ref="form">
+					<input type="hidden" name="action" value="updateItem" />
+					<input type="hidden" name={Keystone.csrf.key} value={Keystone.csrf.value} />
+					<input type="hidden" name="body" ref="bodyField"/>
+					{buttons}
+				</form>
 			</FooterBar>
 		);
 	},
+
+	onClickSave() {
+		this.refs.bodyField.value = JSON.stringify(this.state.values);
+		this.refs.form.submit();
+	},
+
 	renderTrackingMeta () {
 		if (!this.props.list.tracking) return null;
 
@@ -280,12 +291,10 @@ var EditForm = React.createClass({
 	},
 	render () {
 		return (
-			<form method="post" encType="multipart/form-data" className="EditForm-container">
+			<div>
 				<Row>
 					<Col lg="3/4">
 						<Form type="horizontal" className="EditForm" component="div">
-							<input type="hidden" name="action" value="updateItem" />
-							<input type="hidden" name={Keystone.csrf.key} value={Keystone.csrf.value} />
 							{this.renderNameField()}
 							{this.renderKeyOrId()}
 							{this.renderFormElements()}
@@ -296,7 +305,7 @@ var EditForm = React.createClass({
 				</Row>
 				{this.renderFooterBar()}
 				{this.state.confirmationDialog}
-			</form>
+			</div>
 		);
 	},
 });

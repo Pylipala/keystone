@@ -81,6 +81,10 @@ module.exports = function (req, res) {
 				return renderView();
 			}
 
+			if(req.body.body){
+				req.body = JSON.parse(req.body.body);
+			}
+
 			item.getUpdateHandler(req).process(req.body, { flashErrors: true, logErrors: true }, function (err) {
 				if (err) {
 					return renderView();

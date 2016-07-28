@@ -32,4 +32,5 @@ module.exports = {
 	objectarray: require('../../fields/types/objectarray/ObjectArrayField'),
 	nestedobject: require('../../fields/types/nestedobject/NestedObjectField'),
 	freeobject: require('../../fields/types/freeobject/FreeObjectField'),
+	relativetime: require('../../fields/types/relativetime/RelativeTimeField'),
 };
