@@ -1,6 +1,6 @@
 import Field from '../Field';
 import React from 'react';
-import { FormRow, FormField, FormInput, FormLabel } from 'elemental';
+import { FormRow, FormField, FormInput, FormLabel, FormSelect } from 'elemental';
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -37,7 +37,7 @@ module.exports = Field.create({
 	convertValuesToValue: function(values){
 		var factor = values.sign == '-' ? -1 : 1;
 		var seconds = 0;
-		seconds += values.years * 365 * 24 * 60 * 60;
+		seconds += values.years * 366 * 24 * 60 * 60;
 		seconds += values.months * 24 * 60 * 60;
 		seconds += values.days * 60 * 60;
 		seconds += values.hours * 60 * 60;
@@ -77,6 +77,24 @@ module.exports = Field.create({
 
 	renderField () {
 		return (
+			<div>
+			<FormRow>
+				{
+					(()=> {
+						var options = [{label: 'After', value: '+'}, {label: 'Before', value: '-'}];
+						if (this.props.signEditable) {
+							return <FormSelect options={options}
+											   firstOption={'+'}
+											   value={this.state.values.sign}
+												onChange={this.valueChanged.bind(this, 'sign')}>
+							</FormSelect>
+						}else{
+							var label = _.find(options, {value: this.state.values.sign}).label;
+							return <FormLabel>{label}</FormLabel>
+						}
+					})()
+				}
+			</FormRow>
 			<FormRow>
 				{
 					_.map(elems, (u)=>{
@@ -87,6 +105,7 @@ module.exports = Field.create({
 					}, this)
 				}
 			</FormRow>
+			</div>
 		);
 	},
 
