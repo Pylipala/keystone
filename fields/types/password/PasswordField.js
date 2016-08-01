@@ -19,6 +19,17 @@ module.exports = Field.create({
 		var newState = {};
 		newState[which] = event.target.value;
 		this.setState(newState);
+		if(which == 'password'){
+			this.props.onChange({
+				path: this.props.path,
+				value: event.target.value,
+			});
+		}else{
+			this.props.onChange({
+				path: this.props.path + '_confirm',
+				value: event.target.value,
+			});
+		}
 	},
 
 	showChangeUI () {
