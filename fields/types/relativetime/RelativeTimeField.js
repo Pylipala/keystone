@@ -28,7 +28,7 @@ module.exports = Field.create({
 	convertValueToValues: function(value, values){
 		values.sign = value < 0 ? '-' : '+';
 
-		var duration = moment.duration(value, 'seconds');
+		var duration = moment.duration(Math.abs(value), 'seconds');
 		_.each(elems, function(u){
 			values[u] = duration[u]();
 		});
