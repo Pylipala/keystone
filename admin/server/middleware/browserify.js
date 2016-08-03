@@ -13,6 +13,10 @@ var devMode = process.env.KEYSTONE_DEV === 'true';
 var devWriteBundles = process.env.KEYSTONE_WRITE_BUNDLES === 'true';
 var devWriteDisc = process.env.KEYSTONE_WRITE_DISC === 'true';
 
+// disable coloring of output
+chalk = {};
+chalk.gray = chalk.grey = chalk.red = chalk.green = chalk.underline = function(a){return a;};
+
 function ts () {
 	return chalk.gray(moment().format('YYYY-MM-DD HH:MM:SS '));
 }
