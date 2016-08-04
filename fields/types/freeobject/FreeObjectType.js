@@ -75,6 +75,7 @@ freeobject.prototype.updateItem = function(item, data, callback) {
 	}
 
 	item.set(this.path, parseJson(value).value);
+	callback();
 };
 
 /*!
