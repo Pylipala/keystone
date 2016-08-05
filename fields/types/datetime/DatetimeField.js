@@ -57,11 +57,13 @@ module.exports = Field.create({
 	},
 
 	dateChanged ({ value }) {
+		this.state.dateValue = value;
 		this.setState({ dateValue: value });
 		this.handleChange();
 	},
 
 	timeChanged (evt) {
+		this.state.timeValue = evt.target.value;
 		this.setState({ timeValue: evt.target.value });
 		this.handleChange();
 	},
