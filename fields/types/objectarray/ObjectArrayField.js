@@ -3,30 +3,9 @@ var _ = require('underscore'),
 	Field = require('../Field'),
 	lastId = 0;
 
-function newItem(defaultItemValue, parts) {
-	lastId++;
-	var item = {
-		key: 'i' + lastId,
-		obj: {},
-		valueKeys: []
-	};
-
-	for(var i in parts) {
-		if (parts.hasOwnProperty(i)) {
-			item.obj[i] = {
-				key: item.key + '_' + i,
-				fieldName: i,
-				label: parts[i].label,
-				type: parts[i].type,
-				value: defaultItemValue[i] ? defaultItemValue[i] : ''
-			};
-
-			item.valueKeys.push(i);
-		}
-	}
-
-	return item;
-}
+var WidthProvider = require('react-grid-layout').WidthProvider;
+var ReactGridLayout = require('react-grid-layout');
+ReactGridLayout = WidthProvider(ReactGridLayout);
 
 module.exports = Field.create({
 
@@ -37,7 +16,7 @@ module.exports = Field.create({
 
 		if (this.props.value && this.props.value instanceof Array && this.props.value.length) {
 			values = this.props.value.map(function(item) {
-				return newItem(item, this.props.parts);
+				return this.newItem(item, this.props.parts);
 			}.bind(this));
 		} else {
 			values = [];
@@ -48,8 +27,35 @@ module.exports = Field.create({
 		};
 	},
 
+	newItem(defaultItemValue, parts) {
+		lastId++;
+		var item = {
+			key: 'i' + lastId,
+			obj: {},
+			valueKeys: []
+		};
+
+		for (var i in parts) {
+			if (parts.hasOwnProperty(i)) {
+				item.obj[i] = {
+					key: item.key + '_' + i,
+					fieldName: i,
+					label: parts[i].label,
+					type: parts[i].type,
+					value: defaultItemValue[i] ? defaultItemValue[i] : ''
+				};
+				if(this.props.layoutMode == '2d'){
+					item.obj.frame = defaultItemValue.frame || {x: 0, y: 0, w: 4, h: 3}
+				}
+				item.valueKeys.push(i);
+			}
+		}
+
+		return item;
+	},
+
 	addItem: function() {
-		var newValues = this.state.values.concat(newItem({}, this.props.parts));
+		var newValues = this.state.values.concat(this.newItem({}, this.props.parts));
 
 		this.setState({
 			values: newValues
@@ -84,12 +90,17 @@ module.exports = Field.create({
 	valueChanged: function(values) {
 		var objectArray = [];
 
+		var me = this;
+
 		values.forEach(function(item) {
 			var obj = {};
 
 			_.forEach(item.obj, function(val, propertyKey) {
 				if (typeof val !== 'function') {
 					obj[propertyKey] = item.obj[propertyKey].value;
+				}
+				if(me.props.layoutMode == '2d'){
+					obj.frame = item.obj.frame;
 				}
 			});
 
@@ -163,10 +174,39 @@ module.exports = Field.create({
 		);
 	},
 
+	onLayoutChange(layout){
+		console.log(layout);
+		for(var i = 0;i < layout.length; i++){
+			this.state.values[i].obj.frame = _.pick(layout[i], ['x', 'y', 'w', 'h']);
+		}
+		this.valueChanged(this.state.values);
+	},
+
 	renderField: function () {
+		console.log('Layout mode is : ' + this.props.layoutMode);
 		return (
 			<div>
-				{this.state.values.map(this.renderItem)}
+				{
+					(()=>{
+						if(! this.props.layoutMode){
+							return this.state.values.map(this.renderItem)
+						}else if(this.props.layoutMode == '2d'){
+							return <ReactGridLayout
+							className="layout"
+						    cols={12}
+							onLayoutChange={this.onLayoutChange}
+							rowHeight={20} width={1200}>
+								{
+									this.state.values.map((item, itemIndex)=>{
+										return <div key={'i' + itemIndex} data-grid={item.obj.frame}>
+											{this.renderItem(item, itemIndex)}
+										</div>;
+									})
+								}
+							</ReactGridLayout>
+						}
+					})()
+				}
 				<button type="button" className='btn btn-xs btn-default' onClick={this.addItem}>Add item</button>
 			</div>
 		);

@@ -76,6 +76,7 @@ module.exports = function (file, name) {
 		}
 		b.transform(babelify.configure({
 			plugins: [
+				require('babel-plugin-transform-runtime'),
 				require('babel-plugin-transform-object-rest-spread'),
 				require('babel-plugin-transform-object-assign'),
 				require('babel-plugin-syntax-async-functions')],

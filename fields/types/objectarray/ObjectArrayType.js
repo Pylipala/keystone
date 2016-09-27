@@ -21,7 +21,7 @@ function objectarray(list, path, options) {
 
 	this.itemLabel = options.itemLabel || 'Item';
 	this.parts = options.parts;
-
+	this.layoutMode = options.layoutMode;
 
 	objectarray.super_.call(this, list, path, options);
 }
@@ -42,14 +42,21 @@ objectarray.prototype.getProperties = function () {
 	}, this);
 
 	return {
-		partsOptions: this.partsOptions
+		partsOptions: this.partsOptions,
+		layoutMode: this.layoutMode
 	};
 };
 
 objectarray.prototype.addToSchema = function (parentSchemaParam) {
 	var ops = (this._nativeType) ? _.defaults({ type: this._nativeType }, this.options) : this.options;
 	var parentSchema = parentSchemaParam || this.list.schema;
-	var objSchema = new Schema({});
+	var objInit = {};
+	if(this.layoutMode == '1d'){
+		objInit = {sequenceNo: Number}
+	}else if(this.layoutMode == '2d'){
+		objInit = {frame: {x: Number, y: Number, w: Number, h: Number}};
+	}
+	var objSchema = new Schema(objInit);
 	_.each(this.parts, (function(fieldOption, fieldName){
 		fieldOption.isNestedField = true;
 		var childField = new fieldOption.type(this.list, fieldName, fieldOption);
