@@ -83,6 +83,7 @@ module.exports = function bindStaticMiddleware (keystone, app) {
                     responseStatus: { type: Types.Number },
                     responseTime: { type: Types.Datetime },
                     processTime: { type: Types.Number }, // time used to handle the request, in milliseconds
+					responseBody: { type: Types.FreeObject}
                 },
 				'LogLevel',
 				{
@@ -147,12 +148,23 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 
 	_.each(levels, function(level){
 		keystone.logger[level] = function(message, key, detail){
-			var args = arguments;
+			var args = Array.from(arguments);
 			if(args.length == 0){
 				return;
 			}
 			if(args.length == 1 && !args[0]){
 				return;
+			}
+			if(typeof message === 'object'){
+				if(message.toString){
+					message = message.toString();
+				}else{
+					try{
+						message = JSON.stringify(message);
+					}catch(e){
+						message = 'Message that could toString or toJson string...';
+					}
+				}
 			}
 			var d = process.domain;
 			var requestRecord = d ? d.requestRecord : null;
@@ -168,6 +180,10 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 				message: message,
 				detail: detail,
 			});
+
+			if(console['old_' + level]){
+				console['old_' + level].apply(console, arguments);
+			}
 
             logRecord.save(saveCallback);
 		};
@@ -200,6 +216,13 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 		var d = domain.create();
 		d.add(req);
 		d.add(res);
+
+		var oldJson = ::res.json;
+		var responseJson;
+		res.json = (response)=>{
+			responseJson = JSON.parse(JSON.stringify(response));
+			oldJson.call(res, response);
+		};
 		var requestRecord = new logModels.RequestRecord.model({
 			requestTime: new Date(),
 			remoteAddress: req.ip,
@@ -220,6 +243,7 @@ module.exports = function bindStaticMiddleware (keystone, app) {
 				responseStatus: res.statusCode,
 				responseTime: endTime,
 				processTime: endTime - requestRecord.requestTime,
+				responseBody: cu.mongoPatch.escapeDotDollar(responseJson)
 			}, saveCallback);
 		});
 
