@@ -42,7 +42,7 @@ module.exports = Field.create({
 					fieldName: i,
 					label: parts[i].label,
 					type: parts[i].type,
-					value: defaultItemValue[i] ? defaultItemValue[i] : ''
+					value: defaultItemValue[i] ? defaultItemValue[i] : null
 				};
 				if(this.props.layoutMode == '2d'){
 					item.obj.frame = defaultItemValue.frame || {x: 0, y: 0, w: 4, h: 3}
@@ -183,7 +183,6 @@ module.exports = Field.create({
 	},
 
 	renderField: function () {
-		console.log('Layout mode is : ' + this.props.layoutMode);
 		return (
 			<div>
 				{
