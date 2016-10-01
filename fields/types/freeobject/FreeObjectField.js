@@ -14,35 +14,25 @@ module.exports = Field.create({
 		var unescapedValue = util.mongoPatch.unescapeDotDollar(value);
 
 		return {
-			value: JSON.stringify(unescapedValue, null, 4),
+			value: unescapedValue ? JSON.stringify(unescapedValue, null, 4) : '',
 			hasError: false
 		};
 	},
 
-	updateItem: function(obj, objIndex, event) {
-		var updatedValues = this.state.values;
-
-		// if we define cleanInput method then clean it first
-		updatedValues.obj[objIndex].value = this.cleanInput ? this.cleanInput(event.value) : event.value;
-
-		this.setState({
-			values: updatedValues
-		});
-
-		this.valueChanged(updatedValues);
-	},
-
-	valueChanged: function(value) {
+	valueChanged: function(e) {
+		var value = e.target.value;
 		try{
 			JSON.parse(value);
 		}catch(e){
 			this.setState({
+				value: value,
 				hasError: true
 			});
 			return;
 		}
 
 		this.setState({
+			value: value,
 			hasError: false
 		});
 
