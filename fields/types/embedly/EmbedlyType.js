@@ -20,9 +20,6 @@ function embedly (list, path, options) {
 	this.fromPath = options.from;
 	this.embedlyOptions = options.options || {};
 
-	// TODO: implement filtering, usage disabled for now
-	options.nofilter = true;
-
 	// check and api key has been set, or bail.
 	if (!keystone.get('embedly api key')) {
 		throw new Error('Invalid Configuration\n\n'
@@ -45,6 +42,7 @@ function embedly (list, path, options) {
 
 	embedly.super_.call(this, list, path, options);
 }
+embedly.properName = 'Embedly';
 util.inherits(embedly, FieldType);
 
 /**
@@ -58,22 +56,22 @@ embedly.prototype.addToSchema = function (parentSchema) {
 	var schema = parentSchema || this.list.schema;
 
 	this.paths = {
-		exists: this._path.append('.exists'),
-		type: this._path.append('.type'),
-		title: this._path.append('.title'),
-		url: this._path.append('.url'),
-		width: this._path.append('.width'),
-		height: this._path.append('.height'),
-		version: this._path.append('.version'),
-		description: this._path.append('.description'),
-		html: this._path.append('.html'),
-		authorName: this._path.append('.authorName'),
-		authorUrl: this._path.append('.authorUrl'),
-		providerName: this._path.append('.providerName'),
-		providerUrl: this._path.append('.providerUrl'),
-		thumbnailUrl: this._path.append('.thumbnailUrl'),
-		thumbnailWidth: this._path.append('.thumbnailWidth'),
-		thumbnailHeight: this._path.append('.thumbnailHeight'),
+		exists: this.path + '.exists',
+		type: this.path + '.type',
+		title: this.path + '.title',
+		url: this.path + '.url',
+		width: this.path + '.width',
+		height: this.path + '.height',
+		version: this.path + '.version',
+		description: this.path + '.description',
+		html: this.path + '.html',
+		authorName: this.path + '.authorName',
+		authorUrl: this.path + '.authorUrl',
+		providerName: this.path + '.providerName',
+		providerUrl: this.path + '.providerUrl',
+		thumbnailUrl: this.path + '.thumbnailUrl',
+		thumbnailWidth: this.path + '.thumbnailWidth',
+		thumbnailHeight: this.path + '.thumbnailHeight',
 	};
 
 	schema.nested[this.path] = true;
@@ -113,54 +111,41 @@ embedly.prototype.addToSchema = function (parentSchema) {
 
 		var post = this;
 
-		new EmbedlyAPI({ key: keystone.get('embedly api key') }, function (err, api) { // eslint-disable-line no-new
+		var api = new EmbedlyAPI({ key: keystone.get('embedly api key') });
+		var opts = _.defaults({ url: fromValue }, field.embedlyOptions);
 
+		api.oembed(opts, function (err, objs) {
 			if (err) {
-				console.error('Error creating Embedly api:');
-				console.error(err, api);
-				field.reset(this);
-				return next();
-			}
-
-			var opts = _.defaults({ url: fromValue }, field.embedlyOptions);
-
-			api.oembed(opts, function (err, objs) {
-
-				if (err) {
-					console.error('Embedly API Error:');
-					console.error(err, objs);
-					field.reset(post);
+				console.error('Embedly API Error:');
+				console.error(err, objs);
+				field.reset(post);
+			} else {
+				var data = objs[0];
+				if (data && data.type !== 'error') {
+					post.set(field.path, {
+						exists: true,
+						type: data.type,
+						title: data.title,
+						url: data.url,
+						width: data.width,
+						height: data.height,
+						version: data.version,
+						description: data.description,
+						html: data.html,
+						authorName: data.author_name,
+						authorUrl: data.author_url,
+						providerName: data.provider_name,
+						providerUrl: data.provider_url,
+						thumbnailUrl: data.thumbnail_url,
+						thumbnailWidth: data.thumbnail_width,
+						thumbnailHeight: data.thumbnail_height,
+					});
 				} else {
-					var data = objs[0];
-					if (data && data.type !== 'error') {
-						post.set(field.path, {
-							exists: true,
-							type: data.type,
-							title: data.title,
-							url: data.url,
-							width: data.width,
-							height: data.height,
-							version: data.version,
-							description: data.description,
-							html: data.html,
-							authorName: data.author_name,
-							authorUrl: data.author_url,
-							providerName: data.provider_name,
-							providerUrl: data.provider_url,
-							thumbnailUrl: data.thumbnail_url,
-							thumbnailWidth: data.thumbnail_width,
-							thumbnailHeight: data.thumbnail_height,
-						});
-
-					} else {
-						field.reset(post);
-					}
+					field.reset(post);
 				}
-				return next();
-
-			});
+			}
+			return next();
 		});
-
 	});
 
 	this.bindUnderscoreMethods();
@@ -200,6 +185,14 @@ embedly.prototype.reset = function (item) {
  */
 embedly.prototype.format = function (item) {
 	return item.get(this.paths.html);
+};
+
+/**
+ * Gets the field's data from an Item, as used by the React components
+ */
+embedly.prototype.getData = function (item) {
+	var value = item.get(this.path);
+	return typeof value === 'object' ? value : {};
 };
 
 /**

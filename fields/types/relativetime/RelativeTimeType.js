@@ -19,6 +19,9 @@ function relativetime (list, path, options) {
 	options.nofilter = true;
 	relativetime.super_.call(this, list, path, options);
 }
+
+relativetime.properName = 'RelativeTime';
+
 util.inherits(relativetime, FieldType);
 
 /**

@@ -13,10 +13,9 @@ var REGEXP_LNGLAT = /^\s*(\-?\d+(?:\.\d+)?)\s*\,\s*(\-?\d+(?:\.\d+)?)\s*$/;
  */
 function geopoint (list, path, options) {
 	this._fixedSize = 'medium';
-	// TODO: implement filtering
-	options.nofilter = true;
 	geopoint.super_.call(this, list, path, options);
 }
+geopoint.properName = 'GeoPoint';
 util.inherits(geopoint, FieldType);
 
 /**
@@ -90,6 +89,38 @@ geopoint.prototype.inputIsValid = function (data, required, item) { // eslint-di
 	if (typeof values !== 'string') return false;
 	if ((values === '' || values.charAt(0) === ',' || values.charAt(values.length - 1) === ',') && !required) return true;
 	return REGEXP_LNGLAT.test(values);
+};
+
+/**
+ * Filters geopoints based on distance to a center point
+ *
+ * @param {Object} filter 				 The data from the frontend
+ * @param {Number} filter.lat			 The latitude of the center point
+ * @param {Number} filter.lon			 The longitude of the center point
+ * @param {String} filter.distance.mode  The distance mode, either "max" or "min"
+ * @param {Number} filter.distance.value The distance value
+ */
+geopoint.prototype.addFilterToQuery = function (filter) {
+	var query = {};
+	// If latitude or longitude aren't specified, don't filter anything
+	if (filter.lon && filter.lat) {
+		query[this.path] = {
+			$near: {
+				$geometry: {
+					type: 'Point',
+					coordinates: [filter.lon, filter.lat],
+				},
+			},
+		};
+		// MongoDB wants meters, but we accept kilometers via input so we * 1000
+		var distance = (filter.distance.value && filter.distance.value * 1000) || 500000;
+		if (filter.distance.mode === 'min') {
+			query[this.path].$near.$minDistance = distance;
+		} else {
+			query[this.path].$near.$maxDistance = distance;
+		}
+	}
+	return query;
 };
 
 /**

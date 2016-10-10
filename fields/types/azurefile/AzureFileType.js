@@ -1,11 +1,12 @@
-var _ = require('lodash');
-var azure = require('azure');
-var FieldType = require('../Type');
-var grappling = require('grappling-hook');
-var keystone = require('../../../');
-var moment = require('moment');
-var util = require('util');
-var utils = require('keystone-utils');
+/**
+Deprecated.
+
+Using this field will now throw an error, and this code will be removed soon.
+
+See https://github.com/keystonejs/keystone/wiki/File-Fields-Upgrade-Guide
+*/
+
+/* eslint-disable */
 
 /**
  * AzureFile FieldType Constructor
@@ -13,6 +14,12 @@ var utils = require('keystone-utils');
  * @api public
  */
 function azurefile (list, path, options) {
+
+	throw new Error('The AzureFile field type has been removed. Please use File instead.'
+		+ '\n\nSee https://github.com/keystonejs/keystone/wiki/File-Fields-Upgrade-Guide\n');
+
+	/*
+
 	grappling.mixin(this).allowHooks('pre:upload');
 
 	this._underscoreMethods = ['format', 'uploadFile'];
@@ -25,6 +32,10 @@ function azurefile (list, path, options) {
 	if (options.initial) {
 		throw new Error('Invalid Configuration\n\nAzureFile fields (' + list.key + '.' + path + ') do not currently support being used as initial fields.\n');
 	}
+
+	var self = this;
+	options.filenameFormatter = options.filenameFormatter || function (item, filename) { return filename; };
+	options.containerFormatter = options.containerFormatter || function (item, filename) { return self.azurefileconfig.container; };// eslint-disable-line no-unused-vars
 
 	azurefile.super_.call(this, list, path, options);
 
@@ -41,17 +52,16 @@ function azurefile (list, path, options) {
 
 	this.azurefileconfig.container = this.azurefileconfig.container || 'keystone';
 
-	var self = this;
-	options.filenameFormatter = options.filenameFormatter || function (item, filename) { return filename; };
-	options.containerFormatter = options.containerFormatter || function (item, filename) { return self.azurefileconfig.container; };// eslint-disable-line no-unused-vars
-
 	// Could be more pre- hooks, just upload for now
 	if (options.pre && options.pre.upload) {
 		this.pre('upload', options.pre.upload);
 	}
 
+	*/
+
 }
-util.inherits(azurefile, FieldType);
+azurefile.properName = 'AzureFile';
+// util.inherits(azurefile, FieldType);
 
 /**
  * Exposes the custom or keystone s3 config settings
@@ -67,22 +77,24 @@ Object.defineProperty(azurefile.prototype, 'azurefileconfig', {
  */
 azurefile.prototype.addToSchema = function (parentSchema) {
 
+	var azure = require('azure-storage');
+
 	var field = this;
 	var schema = parentSchema || this.list.schema;
 
 	var paths = this.paths = {
 		// fields
-		filename: this._path.append('.filename'),
-		path: this._path.append('.path'),
-		size: this._path.append('.size'),
-		filetype: this._path.append('.filetype'),
-		url: this._path.append('.url'),
-		etag: this._path.append('.etag'),
-		container: this._path.append('.container'),
+		filename: this.path + '.filename',
+		path: this.path + '.path',
+		size: this.path + '.size',
+		filetype: this.path + '.filetype',
+		url: this.path + '.url',
+		etag: this.path + '.etag',
+		container: this.path + '.container',
 		// virtuals
-		exists: this._path.append('.exists'),
-		upload: this._path.append('_upload'),
-		action: this._path.append('_action'),
+		exists: this.path + '.exists',
+		upload: this.path + '_upload',
+		action: this.path + '_action',
 	};
 
 	var schemaPaths = this._path.addTo({}, {
@@ -183,7 +195,7 @@ azurefile.prototype.inputIsValid = function (data) { // eslint-disable-line no-u
 /**
  * Updates the value for this field in the item from a data object
  */
-azurefile.prototype.updateItem = function (item, data, callback) { // eslint-disable-line no-unused-vars
+azurefile.prototype.updateItem = function (item, data, callback) {
 	// TODO - direct updating of data (not via upload)
 	process.nextTick(callback);
 };
@@ -193,8 +205,9 @@ azurefile.prototype.updateItem = function (item, data, callback) { // eslint-dis
  */
 azurefile.prototype.uploadFile = function (item, file, update, callback) {
 
+	var azure = require('azure-storage');
+
 	var field = this;
-	var prefix = field.options.datePrefix ? moment().format(field.options.datePrefix) + '-' : ''; // eslint-disable-line no-unused-var
 	var filetype = file.mimetype || file.type;
 
 	if (field.options.allowedTypes && !_.contains(field.options.allowedTypes, filetype)) {
@@ -214,7 +227,7 @@ azurefile.prototype.uploadFile = function (item, file, update, callback) {
 
 			if (err) return callback(err);
 
-			blobService.createBlockBlobFromLocalFile(container, field.options.filenameFormatter(item, file.name), file.path, function (err, blob, res) { // eslint-disable-line no-unused-vars
+			blobService.createBlockBlobFromLocalFile(container, field.options.filenameFormatter(item, file.name), file.path, function (err, blob, res) {
 
 				if (err) return callback(err);
 
@@ -280,13 +293,6 @@ azurefile.prototype.getRequestHandler = function (item, req, paths, callback) {
 
 	};
 
-};
-
-/**
- * Immediately handles a standard form submission for the field (see `getRequestHandler()`)
- */
-azurefile.prototype.handleRequest = function (item, req, paths, callback) {
-	this.getRequestHandler(item, req, paths, callback)();
 };
 
 /* Export Field Type */

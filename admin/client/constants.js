@@ -1,3 +1,7 @@
+/**
+ * Constants
+ */
+
 // breakpoints
 exports.breakpoint = {
 	xs: 480,
@@ -32,3 +36,8 @@ exports.spacing = {
 	lg: 40,
 	xl: 80,
 };
+
+// table constants
+
+exports.TABLE_CONTROL_COLUMN_WIDTH = 26;  // icon + padding
+exports.NETWORK_ERROR_RETRY_DELAY = 500; // in ms

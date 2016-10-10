@@ -4,6 +4,9 @@ import { Button, FormInput } from 'elemental';
 
 module.exports = Field.create({
 	displayName: 'URLField',
+	statics: {
+		type: 'Url',
+	},
 	openValue () {
 		var href = this.props.value;
 		if (!href) return;
@@ -19,6 +22,18 @@ module.exports = Field.create({
 			<Button type="link" onClick={this.openValue} className="keystone-relational-button" title={'Open ' + this.props.value + ' in a new tab'}>
 				<span className="octicon octicon-link" />
 			</Button>
+		);
+	},
+	renderField () {
+		return (
+			<FormInput
+				name={this.getInputName(this.props.path)}
+				ref="focusTarget"
+				value={this.props.value}
+				onChange={this.valueChanged}
+				autoComplete="off"
+				type="url"
+			/>
 		);
 	},
 	wrapField () {

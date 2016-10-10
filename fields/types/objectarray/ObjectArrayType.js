@@ -26,6 +26,8 @@ function objectarray(list, path, options) {
 	objectarray.super_.call(this, list, path, options);
 }
 
+objectarray.properName = 'ObjectArray';
+
 /*!
  * Inherit from Field
  */

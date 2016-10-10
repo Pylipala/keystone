@@ -12,9 +12,9 @@ var displayName = require('display-name');
 function name (list, path, options) {
 	this._fixedSize = 'full';
 	options.default = { first: '', last: '' };
-	options.nofilter = true; // TODO: remove this when 0.4 is merged
 	name.super_.call(this, list, path, options);
 }
+name.properName = 'Name';
 util.inherits(name, FieldType);
 
 /**
@@ -28,9 +28,9 @@ util.inherits(name, FieldType);
 name.prototype.addToSchema = function (parentSchema) {
 	var schema = parentSchema || this.list.schema;
 	var paths = this.paths = {
-		first: this._path.append('.first'),
-		last: this._path.append('.last'),
-		full: this._path.append('.full'),
+		first: this.path + '.first',
+		last: this.path + '.last',
+		full: this.path + '.full',
 	};
 
 	schema.nested[this.path] = true;
@@ -69,15 +69,12 @@ name.prototype.getSortString = function (options) {
 
 /**
  * Add filters to a query
- *
- * TODO: this filter will conflict with any other $or filter, including filters
- * on other "name" type fields; need to work out a better way to implement.
  */
 name.prototype.addFilterToQuery = function (filter) {
 	var query = {};
 	if (filter.mode === 'exactly' && !filter.value) {
 		query[this.paths.first] = query[this.paths.last] = filter.inverted ? { $nin: ['', null] } : { $in: ['', null] };
-		return;
+		return query;
 	}
 	var value = utils.escapeRegExp(filter.value);
 	if (filter.mode === 'beginsWith') {
@@ -93,15 +90,7 @@ name.prototype.addFilterToQuery = function (filter) {
 	} else {
 		var first = {}; first[this.paths.first] = value;
 		var last = {}; last[this.paths.last] = value;
-		var $or = [first, last];
-		if (query.$and) {
-			query.$and.push({ $or: $or });
-		} else if (query.$or) {
-			query.$and = [{ $or: query.$or }, { $or: $or }];
-			delete query.$or;
-		} else {
-			query.$or = $or;
-		}
+		query.$or = [first, last];
 	}
 	return query;
 };
@@ -132,7 +121,7 @@ name.prototype.getInputFromData = function (data) {
 			last: last,
 		};
 	}
-	return this.getValueFromData(data);
+	return this.getValueFromData(data) || this.getValueFromData(data, '.full');
 };
 
 /**

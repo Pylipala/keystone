@@ -1,3 +1,5 @@
+var assign = require('object-assign');
+
 /*
 	This middleware simplifies returning errors from the API.
 
@@ -12,24 +14,39 @@
 
 module.exports = function (req, res, next) {
 	res.apiError = function apiError (statusCode, error, detail) {
-		if (typeof statusCode !== 'number' && arguments.length < 3) {
+		// process arguments
+		if (typeof statusCode !== 'number' && detail === undefined) {
 			detail = error;
 			error = statusCode;
 			statusCode = 500;
 		}
+		// apply the status code
 		if (statusCode) {
 			res.status(statusCode);
 		}
+		// unpack { error, detail } objects passed as the error argument w/o detail argument
+		if (!detail && typeof error === 'object'
+			&& error.toString() === '[object Object]'
+			&& error.error && error.detail)
+		{
+			detail = error.detail;
+			error = error.error;
+		}
+		// turn Errors into useful output
 		if (error instanceof Error) {
 			error = error.name !== 'Error' ? error.name + ': ' + error.message : error.message;
 		}
 		if (detail instanceof Error) {
 			detail = detail.name !== 'Error' ? detail.name + ': ' + detail.message : detail.message;
 		}
+		// send error as json
 		var data = typeof error === 'string' || (error && detail)
 			? { error: error, detail: detail }
 			: error;
 		res.json(data);
+		return assign({
+			statusCode: statusCode,
+		}, data);
 	};
 	next();
 };

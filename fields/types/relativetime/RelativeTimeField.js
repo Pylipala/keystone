@@ -3,8 +3,7 @@ import React from 'react';
 import { FormRow, FormField, FormInput, FormLabel, FormSelect } from 'elemental';
 import moment from 'moment';
 import _ from 'lodash';
-
-var elems = ['years', 'months', 'days', 'hours', 'minutes', 'seconds'];
+import {convertValueToValues} from './relativeTimeUtil';
 
 module.exports = Field.create({
 
@@ -15,23 +14,12 @@ module.exports = Field.create({
 	getInitialState: function() {
 
 		var value = this.props.value;
-		var values = {};
-
-		this.convertValueToValues(value, values);
+		var values = convertValueToValues(value);
 
 		return {
 			value: value,
 			values: values
 		};
-	},
-
-	convertValueToValues: function(value, values){
-		values.sign = value < 0 ? '-' : '+';
-
-		var duration = moment.duration(Math.abs(value), 'seconds');
-		_.each(elems, function(u){
-			values[u] = duration[u]();
-		});
 	},
 
 	convertValuesToValue: function(values){

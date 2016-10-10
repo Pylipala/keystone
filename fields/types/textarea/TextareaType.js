@@ -13,9 +13,11 @@ function textarea (list, path, options) {
 	this._nativeType = String;
 	this._underscoreMethods = ['format', 'crop'];
 	this.height = options.height || 90;
-	this._properties = ['height'];
+	this.multiline = true;
+	this._properties = ['height', 'multiline'];
 	textarea.super_.call(this, list, path, options);
 }
+textarea.properName = 'Textarea';
 util.inherits(textarea, FieldType);
 
 

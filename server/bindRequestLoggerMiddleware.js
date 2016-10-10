@@ -7,7 +7,7 @@ const domain = require('domain');
 const process = require('process');
 const cu = require('@pylipala.com/chunxiao-util');
 
-module.exports = function bindStaticMiddleware (keystone, app) {
+module.exports = function bindLoggingMiddleware (keystone, app) {
 	var option = keystone.get('requestLogger');
 
 	if(! option){

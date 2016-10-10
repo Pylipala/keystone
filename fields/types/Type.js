@@ -24,11 +24,11 @@ var DEFAULT_OPTION_KEYS = [
 	'noedit',
 	'nocol',
 	'nosort',
-	'nofilter',
 	'indent',
 	'hidden',
 	'collapse',
 	'dependsOn',
+	'autoCleanup',
 ];
 
 /**
@@ -47,7 +47,7 @@ function Field (list, path, options) {
 	this.path = path;
 
 	this.type = this.constructor.name;
-	this.options = utils.options(this.defaults, options);
+	this.options = _.defaults({}, options, this.defaults);
 	this.label = options.label || utils.keyToLabel(this.path);
 	this.typeDescription = options.typeDescription || this.typeDescription || this.type;
 
@@ -142,7 +142,7 @@ Field.prototype.getSize = function () {
  * Gets default value for the field, based on the option or default for the type
  */
 Field.prototype.getDefaultValue = function () {
-	return this.options.default || '';
+	return typeof this.options.default !== 'undefined' ? this.options.default : '';
 };
 
 /**
@@ -164,10 +164,10 @@ Field.prototype.getPreSaveWatcher = function () {
 		applyValue = function () { return true; };
 	} else {
 		// if watch is a string, convert it to a list of paths to watch
-		if (_.isString(this.options.watch)) {
+		if (typeof this.options.watch === 'string') {
 			this.options.watch = this.options.watch.split(' ');
 		}
-		if (_.isFunction(this.options.watch)) {
+		if (typeof this.options.watch === 'function') {
 			applyValue = this.options.watch;
 		} else if (_.isArray(this.options.watch)) {
 			applyValue = function (item) {
@@ -194,7 +194,7 @@ Field.prototype.getPreSaveWatcher = function () {
 		process.exit(1);
 	}
 
-	if (!_.isFunction(this.options.value)) {
+	if (typeof this.options.value !== 'function') {
 		console.error('\nError: Invalid Configuration\n\n'
 		+ 'Watch set with no value method provided for ' + this.list.key + '.' + this.path + ' (' + this.type + ')');
 		process.exit(1);
@@ -228,7 +228,6 @@ definePrototypeGetters(Field, {
 	noedit: function () { return this.options.noedit || false; },
 	nocol: function () { return this.options.nocol || false; },
 	nosort: function () { return this.options.nosort || false; },
-	nofilter: function () { return this.options.nofilter || false; },
 	collapse: function () { return this.options.collapse || false; },
 	hidden: function () { return this.options.hidden || false; },
 	dependsOn: function () { return this.options.dependsOn || false; },
@@ -250,9 +249,9 @@ Field.prototype.addToSchema = function (parentSchemaParam) {
  * Must be called by the field type's `addToSchema` method
  * Always includes the `update` method
  */
-Field.prototype.bindUnderscoreMethods = function (methods) {
+Field.prototype.bindUnderscoreMethods = function () {
 	var field = this;
-	(this._underscoreMethods || []).concat({ fn: 'updateItem', as: 'update' }, (methods || [])).forEach(function (method) {
+	(this._underscoreMethods || []).concat({ fn: 'updateItem', as: 'update' }).forEach(function (method) {
 		if (typeof method === 'string') {
 			method = { fn: method, as: method };
 		}

@@ -1,8 +1,12 @@
+/*
+TODO: this file has been left as a reference for the new File type field.
+Some features here, including size formatting and icons, may be ported across.
+*/
+
 import _ from 'lodash';
 import bytes from 'bytes';
 import Field from '../Field';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Button, FormField, FormInput, FormNote } from 'elemental';
 
 const ICON_EXTS = [
@@ -17,7 +21,6 @@ var LocalFilesFieldItem = React.createClass({
 		deleted: React.PropTypes.bool,
 		filename: React.PropTypes.string,
 		isQueued: React.PropTypes.bool,
-		key: React.PropTypes.number,
 		size: React.PropTypes.number,
 		toggleDelete: React.PropTypes.func,
 	},
@@ -60,6 +63,8 @@ var LocalFilesFieldItem = React.createClass({
 
 });
 
+var tempId = 0;
+
 module.exports = Field.create({
 
 	getInitialState () {
@@ -77,10 +82,11 @@ module.exports = Field.create({
 		var thumbs = [];
 		var self = this;
 		_.forEach(this.state.items, function (thumb) {
+			var newProps = Object.assign({}, thumb.props);
 			if (thumb.props._id === id) {
-				thumb.props.deleted = !thumb.props.deleted;
+				newProps.deleted = !thumb.props.deleted;
 			}
-			self.pushItem(thumb.props, thumbs);
+			self.pushItem(newProps, thumbs);
 		});
 
 		this.setState({ items: thumbs });
@@ -88,15 +94,14 @@ module.exports = Field.create({
 
 	pushItem (args, thumbs) {
 		thumbs = thumbs || this.state.items;
-		var i = thumbs.length;
 		args.toggleDelete = this.removeItem.bind(this, args._id);
 		args.shouldRenderActionButton = this.shouldRenderField();
 		args.adminPath = Keystone.adminPath;
-		thumbs.push(<LocalFilesFieldItem key={args._id} {...args} />);
+		thumbs.push(<LocalFilesFieldItem key={args._id || tempId++} {...args} />);
 	},
 
 	fileFieldNode () {
-		return ReactDOM.findDOMNode(this.refs.fileField);
+		return this.refs.fileField;
 	},
 
 	renderFileField () {
@@ -194,7 +199,7 @@ module.exports = Field.create({
 
 	renderUI () {
 		return (
-			<FormField label={this.props.label} className="field-type-localfiles">
+			<FormField label={this.props.label} className="field-type-localfiles" htmlFor={this.props.path}>
 				{this.renderFieldAction()}
 				{this.renderUploadsField()}
 				{this.renderFileField()}

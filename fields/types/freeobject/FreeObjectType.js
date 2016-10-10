@@ -21,6 +21,8 @@ function freeobject(list, path, options) {
 	freeobject.super_.call(this, list, path, options);
 }
 
+freeobject.properName = 'FreeObject';
+
 /*!
  * Inherit from Field
  */

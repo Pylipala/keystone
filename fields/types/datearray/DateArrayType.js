@@ -2,6 +2,8 @@ var FieldType = require('../Type');
 var moment = require('moment');
 var util = require('util');
 var utils = require('keystone-utils');
+var addPresenceToQuery = require('../../utils/addPresenceToQuery');
+var DateType = require('../date/DateType');
 
 /**
  * Date FieldType Constructor
@@ -21,6 +23,7 @@ function datearray (list, path, options) {
 	this.separator = options.separator || ' | ';
 	datearray.super_.call(this, list, path, options);
 }
+datearray.properName = 'DateArray';
 util.inherits(datearray, FieldType);
 
 /**
@@ -105,6 +108,25 @@ datearray.prototype.validateRequiredInput = function (item, data, callback) {
 };
 
 /**
+ * Add filters to a query
+ *
+ * @param {Object} filter 			   		The data from the frontend
+ * @param {String} filter.mode  	   		The filter mode, either one of "on",
+ *                                     		"after", "before" or "between"
+ * @param {String} [filter.presence='some'] The presence mode, either on of
+ *                                          "none" and "some". Default: 'some'
+ * @param {String|Object} filter.value 		The value that is filtered for
+ */
+datearray.prototype.addFilterToQuery = function (filter) {
+	var dateTypeAddFilterToQuery = DateType.prototype.addFilterToQuery.bind(this);
+	var query = dateTypeAddFilterToQuery(filter);
+	if (query[this.path]) {
+		query[this.path] = addPresenceToQuery(filter.presence || 'some', query[this.path]);
+	}
+	return query;
+};
+
+/**
  * Checks that a valid array of dates has been provided in a data object
  * An empty value clears the stored value and is considered valid
  *
@@ -161,24 +183,22 @@ datearray.prototype.updateItem = function (item, data, callback) {
 
 	var value = this.getValueFromData(data);
 
-	if (value !== undefined) {
-		if (Array.isArray(value)) {
-			// Only save valid dates
-			value = value.filter(function (date) {
-				return moment(date).isValid();
-			});
+	if (Array.isArray(value)) {
+		// Only save valid dates
+		value = value.filter(function (date) {
+			return moment(date).isValid();
+		});
+	}
+	if (value === null || value === undefined) {
+		value = [];
+	}
+	if (typeof value === 'string') {
+		if (moment(value).isValid()) {
+			value = [value];
 		}
-		if (value === null) {
-			value = [];
-		}
-		if (typeof value === 'string') {
-			if (moment(value).isValid()) {
-				value = [value];
-			}
-		}
-		if (Array.isArray(value)) {
-			item.set(this.path, value);
-		}
+	}
+	if (Array.isArray(value)) {
+		item.set(this.path, value);
 	}
 
 	process.nextTick(callback);

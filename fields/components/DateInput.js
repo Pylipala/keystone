@@ -1,8 +1,8 @@
 import moment from 'moment';
 import DayPicker from 'react-day-picker';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Popout from '../../admin/client/components/Popout';
+import { findDOMNode } from 'react-dom';
+import Popout from '../../admin/client/App/shared/Popout';
 import { FormInput } from 'elemental';
 
 let lastId = 0;
@@ -14,7 +14,7 @@ module.exports = React.createClass({
 		name: React.PropTypes.string,
 		onChange: React.PropTypes.func.isRequired,
 		path: React.PropTypes.string,
-		value: React.PropTypes.string.isRequired,
+		value: React.PropTypes.string,
 	},
 	getDefaultProps () {
 		return {
@@ -47,7 +47,7 @@ module.exports = React.createClass({
 	},
 	focus () {
 		if (!this.refs.input) return;
-		this.refs.input.focus();
+		findDOMNode(this.refs.input).focus();
 	},
 	handleInputChange (e) {
 		const { value } = e.target;
@@ -56,7 +56,6 @@ module.exports = React.createClass({
 	handleKeyPress (e) {
 		if (e.key === 'Enter') {
 			e.preventDefault();
-			const parsedDate = moment(this.state.inputValue, this.props.format);
 			// If the date is strictly equal to the format string, dispatch onChange
 			if (moment(this.state.inputValue, this.props.format, true).isValid()) {
 				this.props.onChange({ value: this.state.inputValue });
@@ -69,10 +68,10 @@ module.exports = React.createClass({
 		}
 	},
 	handleDaySelect (e, date, modifiers) {
-		if (modifiers.indexOf('disabled') > -1) {
-			return;
-		}
+		if (modifiers && modifiers.disabled) return;
+
 		var value = moment(date).format(this.props.format);
+
 		this.props.onChange({ value });
 		this.setState({
 			pickerIsOpen: false,
@@ -91,8 +90,11 @@ module.exports = React.createClass({
 		if (this.state.pickerIsOpen) return;
 		this.showPicker();
 	},
+	handleCancel () {
+		this.setState({ pickerIsOpen: false });
+	},
 	handleBlur (e) {
-		let rt = e.relatedTarget;
+		let rt = e.relatedTarget || e.nativeEvent.explicitOriginalTarget;
 		const popout = this.refs.popout.getPortalDOMNode();
 		while (rt) {
 			if (rt === popout) return;
@@ -116,23 +118,26 @@ module.exports = React.createClass({
 					id={this.state.id}
 					name={this.props.name}
 					onBlur={this.handleBlur}
-					onFocus={this.handleFocus}
 					onChange={this.handleInputChange}
+					onFocus={this.handleFocus}
+					onKeyPress={this.handleKeyPress}
 					placeholder={this.props.format}
 					ref="input"
-					onKeyPress={this.handleKeyPress}
-					value={this.state.inputValue} />
+					value={this.state.inputValue}
+				/>
 				<Popout
-					ref="popout"
 					isOpen={this.state.pickerIsOpen}
-					onCancel={() => this.setState({ pickerIsOpen: false })}
+					onCancel={this.handleCancel}
+					ref="popout"
 					relativeToID={this.state.id}
-					width={260}>
+					width={260}
+					>
 					<DayPicker
-						ref="picker"
 						modifiers={modifiers}
 						onDayClick={this.handleDaySelect}
-						tabIndex={-1} />
+						ref="picker"
+						tabIndex={-1}
+					/>
 				</Popout>
 			</div>
 		);

@@ -1,23 +1,19 @@
 import React from 'react';
 import ItemsTableCell from '../../../admin/client/components/ItemsTable/ItemsTableCell';
 import ItemsTableValue from '../../../admin/client/components/ItemsTable/ItemsTableValue';
+import {getDisplay} from './relativeTimeUtil';
 
-var GeoPointColumn = React.createClass({
-	displayName: 'GeoPointColumn',
-	propTypes: {
-		col: React.PropTypes.object,
-		data: React.PropTypes.object,
-	},
+var RelativeColumnColumn = React.createClass({
+	displayName: 'RelativeColumnColumn',
 	renderValue () {
 		const value = this.props.data.fields[this.props.col.path];
-		if (!value || !value.length) return null;
+		if (!value) return null;
 
-		const formattedValue = `${value[1]}, ${value[0]}`;
-		const formattedTitle = `Lat: ${value[1]} Lng: ${value[0]}`;
+		var display = getDisplay(value);
 
 		return (
-			<ItemsTableValue title={formattedTitle} field={this.props.col.type}>
-				{formattedValue}
+			<ItemsTableValue field={this.props.col.type}>
+				{display}
 			</ItemsTableValue>
 		);
 	},
@@ -30,4 +26,4 @@ var GeoPointColumn = React.createClass({
 	},
 });
 
-module.exports = GeoPointColumn;
+module.exports = RelativeColumnColumn;

@@ -26,6 +26,8 @@ function nestedobject(list, path, options) {
 	nestedobject.super_.call(this, list, path, options);
 }
 
+nestedobject.properName = 'NestedObject';
+
 /*!
  * Inherit from Field
  */

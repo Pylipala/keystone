@@ -21,7 +21,7 @@ function select (list, path, options) {
 		throw new Error('Select fields require an options array.');
 	}
 	this.ops = options.options.map(function (i) {
-		var op = _.isString(i) ? { value: i.trim(), label: utils.keyToLabel(i) } : i;
+		var op = typeof i === 'string' ? { value: i.trim(), label: utils.keyToLabel(i) } : i;
 		if (!_.isObject(op)) {
 			op = { label: '' + i, value: '' + i };
 		}
@@ -35,13 +35,14 @@ function select (list, path, options) {
 		options.emptyOption = true;
 	}
 	// ensure this.emptyOption is a boolean
-	this.emptyOption = options.emptyOption ? true : false;
+	this.emptyOption = !!options.emptyOption;
 	// cached maps for options, labels and values
 	this.map = utils.optionsMap(this.ops);
 	this.labels = utils.optionsMap(this.ops, 'label');
 	this.values = _.map(this.ops, 'value');
 	select.super_.call(this, list, path, options);
 }
+select.properName = 'Select';
 util.inherits(select, FieldType);
 
 /**
@@ -55,10 +56,10 @@ select.prototype.addToSchema = function (parentSchema) {
 	var field = this;
 	var schema = parentSchema || this.list.schema;
 	this.paths = {
-		data: this.options.dataPath || this._path.append('Data'),
-		label: this.options.labelPath || this._path.append('Label'),
-		options: this.options.optionsPath || this._path.append('Options'),
-		map: this.options.optionsMapPath || this._path.append('OptionsMap'),
+		data: this.options.dataPath || this.path + 'Data',
+		label: this.options.labelPath || this.path + 'Label',
+		options: this.options.optionsPath || this.path + 'Options',
+		map: this.options.optionsMapPath || this.path + 'OptionsMap',
 	};
 	schema.path(this.path, _.defaults({
 		type: this._nativeType,
