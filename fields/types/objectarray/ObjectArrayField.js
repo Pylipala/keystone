@@ -1,4 +1,4 @@
-var _ = require('underscore'),
+var _ = require('lodash'),
 	React = require('react'),
 	Field = require('../Field'),
 	lastId = 0;
