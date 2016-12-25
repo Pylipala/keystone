@@ -26,6 +26,11 @@ module.exports = Field.create({
 			dateValue: this.props.value && this.moment(this.props.value).format(this.dateInputFormat),
 			timeValue: this.props.value && this.moment(this.props.value).format(this.timeInputFormat),
 			tzOffsetValue: this.props.value ? this.moment(this.props.value).format(this.tzOffsetInputFormat) : this.moment().format(this.tzOffsetInputFormat),
+			paths: {
+				date: this.props.path + '_date',
+				time: this.props.path + '_time',
+				tzOffset: this.props.path + '_tzOffset',
+			}
 		};
 	},
 
