@@ -5,7 +5,7 @@ var moment = require('moment');
 var packages = require('../../client/packages');
 var path = require('path');
 
-var basedir = path.resolve(__dirname + '/../../client/');
+var basedirDefault = path.resolve(__dirname + '/../../client/');
 var devMode = process.env.KEYSTONE_DEV === 'true';
 var devWriteBundles = process.env.KEYSTONE_WRITE_BUNDLES === 'true';
 var devWriteDisc = process.env.KEYSTONE_WRITE_DISC === 'true';
@@ -18,10 +18,6 @@ function ts () {
 	return chalk.gray(moment().format('YYYY-MM-DD HH:MM:SS '));
 }
 
-function logInit (file) {
-	console.log(chalk.grey('Watching ') + chalk.underline(file) + chalk.grey(' for changes...'));
-}
-
 function logRebuild (file) {
 	console.log(ts() + chalk.green('rebuilt ' + chalk.underline(file)));
 }
@@ -30,7 +26,13 @@ function logError (file, err) {
 	console.log(ts() + chalk.red('error building ' + chalk.underline(file) + ':') + '\n' + err.message);
 }
 
-module.exports = function (file, name) {
+module.exports = function (file, name, baseDirParam) {
+	var basedir = baseDirParam || basedirDefault;
+
+	function logInit (file) {
+		console.log(chalk.grey('Watching ') + chalk.underline(basedir + file) + chalk.grey(' for changes...'));
+	}
+
 	var b;
 	var building = false;
 	var queue = [];
