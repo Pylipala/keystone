@@ -67,26 +67,12 @@ nestedobject.prototype.addToSchema = function (parentSchemaParam) {
  * @api public
  */
 
-nestedobject.prototype.validateInput = function(data, required, item) {
+nestedobject.prototype.validateInput = function(data, callback) {
 	var value = this.getValueFromData(data);
 
-	if (required) {
-		if (value === undefined && item && item.get(this.path)) {
-			return true;
-		}
+	// TODO validate child node
 
-		if (value === undefined || !_.isObject(value)) {
-			return false;
-		}
-
-		if (Array.isArray(value) && !value.length) {
-			return false;
-		}
-
-		return true;
-	}
-
-	return (value === undefined || _.isObject(value));
+	return utils.defer(callback, true);
 };
 
 /**

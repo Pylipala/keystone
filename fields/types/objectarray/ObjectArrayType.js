@@ -74,26 +74,12 @@ objectarray.prototype.addToSchema = function (parentSchemaParam) {
  * @api public
  */
 
-objectarray.prototype.validateInput = function(data, required, item) {
+objectarray.prototype.validateInput = function(data, callback, item) {
 	var value = this.getValueFromData(data);
 
-	if (required) {
-		if (value === undefined && item && item.get(this.path) && item.get(this.path).length) {
-			return true;
-		}
+	// TODO validate child node
 
-		if (value === undefined || !Array.isArray(value)) {
-			return false;
-		}
-
-		if (Array.isArray(value) && !value.length) {
-			return false;
-		}
-
-		return true;
-	}
-
-	return (value === undefined || Array.isArray(value));
+	return utils.defer(callback, true);
 };
 
 /**

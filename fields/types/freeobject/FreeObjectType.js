@@ -45,22 +45,16 @@ var parseJson = function(v){
 	}
 }
 
-freeobject.prototype.validateInput = function(data, required, item) {
+freeobject.prototype.validateInput = function(data, callback) {
 	var value = this.getValueFromData(data);
 
-	if (required) {
-		if (value === undefined && item && item.get(this.path)) {
-			return true;
-		}
+	var valid = true;
 
-		if(! parseJson(value).success){
-			return false;
-		}
-
-		return true;
+	if (_.isString(value)){
+		valid = parseJson(value).success;
 	}
 
-	return (value === undefined || _.isString(value));
+	utils.defer(callback, valid);
 };
 
 /**
