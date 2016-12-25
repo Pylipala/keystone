@@ -1,10 +1,12 @@
 var path = require('path');
+var ejs = require('ejs');
 
 module.exports = function initViewEngine (keystone, app) {
 	// Allow usage of custom view engines
 	if (keystone.get('custom engine')) {
 		app.engine(keystone.get('view engine'), keystone.get('custom engine'));
 	}
+	keystone.app.engine('ejs', ejs.renderFile);
 
 	// Set location of view templates and view engine
 	app.set('views', keystone.getPath('views') || path.sep + 'views');
