@@ -5,6 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= codemirrorPath %>/codemirror.css">
+	  <link rel="stylesheet" href="<%= codemirrorPath %>/night.css">
     <link rel="stylesheet" href="<%= adminPath %>/styles/keystone.min.css">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   </head>
@@ -28,6 +29,8 @@
 <% } } -%>
 <% if (fieldTypes.code) { -%>
     <script src="<%= codemirrorPath %>/codemirror-compressed.js"></script>
+	<script src="<%= codemirrorPath %>/fullscreen.js"></script>
+	<link rel="stylesheet" href="<%= codemirrorPath %>/fullscreen.css">
 <% } -%>
     <script src="<%= adminPath %>/js/packages.js"></script>
     <script src="<%= adminPath %>/js/fields.js"></script>

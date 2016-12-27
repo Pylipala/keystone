@@ -33,6 +33,15 @@ module.exports = Field.create({
 		var options = _.defaults({}, this.props.editor, {
 			lineNumbers: true,
 			readOnly: this.shouldRenderField() ? false : true,
+			theme: "night",
+			extraKeys: {
+				"F11": function(cm) {
+					cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+				},
+				"Esc": function(cm) {
+					if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+				}
+			}
 		});
 
 		this.codeMirror = CodeMirror.fromTextArea(findDOMNode(this.refs.codemirror), options);
