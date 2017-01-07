@@ -34,6 +34,7 @@ module.exports = Field.create({
 			lineNumbers: true,
 			readOnly: this.shouldRenderField() ? false : true,
 			theme: "night",
+			indentUnit: 4,
 			extraKeys: {
 				"F11": function(cm) {
 					cm.setOption("fullScreen", !cm.getOption("fullScreen"));

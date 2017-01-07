@@ -3,7 +3,7 @@ import React from 'react';
 import { FormRow, FormField, FormInput, FormLabel, FormSelect } from 'elemental';
 import moment from 'moment';
 import _ from 'lodash';
-import {convertValueToValues} from './relativeTimeUtil';
+import {convertValueToValues, elems} from './relativeTimeUtil';
 
 module.exports = Field.create({
 
@@ -42,7 +42,7 @@ module.exports = Field.create({
 			values: this.state.values
 		});
 		this.props.onChange({
-			path: this.state.path,
+			path: this.props.path,
 			value: this.state.value,
 		});
 	},

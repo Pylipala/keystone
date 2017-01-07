@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width">
     <title><%= title %></title>
-    <link rel="stylesheet" href="<%= codemirrorPath %>/codemirror.css">
+	  <link rel="stylesheet" href="<%= codemirrorPath %>/codemirror.css">
 	  <link rel="stylesheet" href="<%= codemirrorPath %>/night.css">
     <link rel="stylesheet" href="<%= adminPath %>/styles/keystone.min.css">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -27,6 +27,10 @@
     <script src="<%= adminPath %>/js/lib/cloudinary/jquery.cloudinary.js"></script>
     <%- cloudinaryScript %>
 <% } } -%>
+<% if(fieldTypes.geopoint) { %>
+	<link rel="stylesheet" href="<%= adminPath %>/libs/Leaflet.MapCenterCoord-0.7/src/L.Control.MapCenterCoord.css">
+	<script src="<%= adminPath %>/libs/Leaflet.MapCenterCoord-0.7/src/L.Control.MapCenterCoord.js"></script>
+<% } %>
 <% if (fieldTypes.code) { -%>
     <script src="<%= codemirrorPath %>/codemirror-compressed.js"></script>
 	<script src="<%= codemirrorPath %>/fullscreen.js"></script>

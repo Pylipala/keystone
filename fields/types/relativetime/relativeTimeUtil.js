@@ -14,6 +14,7 @@ function convertValueToValues(value){
 	_.each(elems, function(u){
 		values[u] = duration[u]();
 	});
+	return values;
 }
 
 function getDisplay(value){
@@ -29,5 +30,6 @@ function getDisplay(value){
 
 module.exports = {
 	convertValueToValues,
-	getDisplay
+	getDisplay,
+	elems
 };
